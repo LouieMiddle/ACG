@@ -21,44 +21,40 @@
 
 #include "hit.h"
 
-Hit* Hit::free_pool = (Hit *)0;
+Hit *Hit::free_pool = (Hit *) 0;
 
 int Hit::allocated = 0;
 int Hit::pool_size = 0;
 
-void* Hit::operator new(size_t size)
-{
-	allocated += 1;
+void *Hit::operator new(size_t size) {
+    allocated += 1;
 
-	if (free_pool == 0)
-	{
-		Hit* pool = new Hit[100];
-		free_pool = pool;
+    if (free_pool == 0) {
+        Hit *pool = new Hit[100];
+        free_pool = pool;
 
-		for (int i = 0; i < 99; i += 1)
-		{
-			pool[i].next = &pool[i+1];
-		}
-		pool[99].next = 0;
+        for (int i = 0; i < 99; i += 1) {
+            pool[i].next = &pool[i + 1];
+        }
+        pool[99].next = 0;
 
-		pool_size += 100;
-	}
+        pool_size += 100;
+    }
 
-	Hit* next = free_pool;
-	free_pool = free_pool->next;
-	next->next = 0;
-	return next;
+    Hit *next = free_pool;
+    free_pool = free_pool->next;
+    next->next = 0;
+    return next;
 }
 
-void Hit::operator delete(void* p)
-{
-	allocated -= 1;
-	((Hit*)p)->next = free_pool;
-	free_pool = (Hit*)p;
+void Hit::operator delete(void *p) {
+    allocated -= 1;
+    ((Hit *) p)->next = free_pool;
+    free_pool = (Hit *) p;
 }
 
-ostream& operator<<(ostream& os, const Hit& h)
-{
-  os << "Hit{" <<",[" << h.position.x << "," << h.position.y << "," << h.position.z << "],[" << h.normal.x << "," << h.normal.y << "," << h.normal.z << "]}\n";
-  return os;
+ostream &operator<<(ostream &os, const Hit &h) {
+    os << "Hit{" << ",[" << h.position.x << "," << h.position.y << "," << h.position.z << "],[" << h.normal.x << ","
+       << h.normal.y << "," << h.normal.z << "]}\n";
+    return os;
 }

@@ -16,63 +16,53 @@
 * produced it.
 */
 
- // A simple Phong based lighting model.
+// A simple Phong based lighting model.
 
 #include "compound_material.h"
 
 
-CompoundMaterial::CompoundMaterial(int p_number)
-{
-	number = p_number;
-	for (int i = 0; i < number; i += 1)
-	{
-		materials[i] = 0;
-	}
+CompoundMaterial::CompoundMaterial(int p_number) {
+    number = p_number;
+    for (int i = 0; i < number; i += 1) {
+        materials[i] = 0;
+    }
 }
 
-CompoundMaterial::~CompoundMaterial()
-{
+CompoundMaterial::~CompoundMaterial() {
 }
 
-void CompoundMaterial::include_material(Material *p_new)
-{
-	for (int i = 0; i < number; i += 1)
-	{
-		if (materials[i] == 0)
-		{
-			materials[i] = p_new;
-			return;
-		}
-	}
+void CompoundMaterial::include_material(Material *p_new) {
+    for (int i = 0; i < number; i += 1) {
+        if (materials[i] == 0) {
+            materials[i] = p_new;
+            return;
+        }
+    }
 }
 
 // The compute_once() method supplies the ambient term.
-Colour CompoundMaterial::compute_once(Ray& viewer, Hit& hit, int recurse)
-{
-	Colour result = Colour(0.0f, 0.0f, 0.0f);
+Colour CompoundMaterial::compute_once(Ray &viewer, Hit &hit, int recurse) {
+    Colour result = Colour(0.0f, 0.0f, 0.0f);
 
-	for (int i = 0; i < number; i += 1)
-	{
-		if (materials[i] == 0) return result;
+    for (int i = 0; i < number; i += 1) {
+        if (materials[i] == 0) return result;
 
-		result += materials[i]->compute_once(viewer, hit, recurse);
-	}
+        result += materials[i]->compute_once(viewer, hit, recurse);
+    }
 
-	return result;
+    return result;
 }
 
 // The compute_per_light() method supplies the diffuse and specular terms.
-Colour CompoundMaterial::compute_per_light(Vector& viewer, Hit& hit, Vector& ldir)
-{
-	Colour result;
+Colour CompoundMaterial::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
+    Colour result;
 
-	for (int i = 0; i < number; i += 1)
-	{
-		if (materials[i] == 0) return result;
+    for (int i = 0; i < number; i += 1) {
+        if (materials[i] == 0) return result;
 
-		result += materials[i]->compute_per_light(viewer, hit, ldir);
-	}
+        result += materials[i]->compute_per_light(viewer, hit, ldir);
+    }
 
-	return result;
+    return result;
 }
 

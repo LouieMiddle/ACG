@@ -18,28 +18,24 @@
 
 #include "directional_light.h"
 
-DirectionalLight::DirectionalLight()
-{
-	Light();
+DirectionalLight::DirectionalLight() {
+    Light();
 }
 
-DirectionalLight::DirectionalLight(Vector dir, Colour col)
-{
-	Light();
+DirectionalLight::DirectionalLight(Vector dir, Colour col) {
+    Light();
 
-	direction = dir;
-	direction.normalise();
-	intensity = col;
+    direction = dir;
+    direction.normalise();
+    intensity = col;
 }
 
-bool DirectionalLight::get_direction(Vertex &surface, Vector &dir)
-{
-	dir = direction;
+bool DirectionalLight::get_direction(Vertex &surface, Vector &dir) {
+    dir = direction;
 
-	return true;
+    return true;
 }
 
-void DirectionalLight::get_intensity(Vertex &surface, Colour &level)
-{
-	level = intensity;
+void DirectionalLight::get_intensity(Vertex &surface, Colour &level) {
+    level = intensity;
 }

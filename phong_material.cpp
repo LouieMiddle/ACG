@@ -16,33 +16,30 @@
 * produced it.
 */
 
- // A simple Phong based lighting model.
+// A simple Phong based lighting model.
 
 #include "phong_material.h"
 
 #include <math.h>
 
-Phong::Phong(Colour p_ambient, Colour p_diffuse, Colour p_specular, float p_power)
-{
+Phong::Phong(Colour p_ambient, Colour p_diffuse, Colour p_specular, float p_power) {
 //BEGIN_STAGE_ONE
 //END_STAGE_ONE
 }
 
 // The compute_once() method supplies the ambient term.
-Colour Phong::compute_once(Ray& viewer, Hit& hit, int recurse)
-{
-	Colour result;
+Colour Phong::compute_once(Ray &viewer, Hit &hit, int recurse) {
+    Colour result;
 //BEGIN_STAGE_ONE
 //END_STAGE_ONE
-	return result;
+    return result;
 }
 
 // The compute_per_light() method supplies the diffuse and specular terms.
-Colour Phong::compute_per_light(Vector& viewer, Hit& hit, Vector& ldir)
-{
-	Colour result;
+Colour Phong::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
+    Colour result;
 //BEGIN_STAGE_ONE
 //END_STAGE_ONE
-	return result;
+    return result;
 }
 

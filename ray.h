@@ -21,6 +21,7 @@
 #pragma once
 
 #include <iostream>
+
 using namespace std;
 
 #include "vector.h"
@@ -28,23 +29,21 @@ using namespace std;
 
 class Ray {
 public:
-	Vertex position;
-	Vector direction;
+    Vertex position;
+    Vector direction;
 
-	Ray()
-	{
-	}
+    Ray() {
+    }
 
-	Ray(Vertex p, Vector d)
-	{
-		position = p;
-		direction = d;
-	}
+    Ray(Vertex p, Vector d) {
+        position = p;
+        direction = d;
+    }
 
-	//A handy debug operator
-	friend ostream& operator<<(ostream& os, const Ray& r)
-	{
-	  os << "Ray{[" << r.position.x << "," << r.position.y << "," << r.position.z << "],[" << r.direction.x << "," << r.direction.y << "," << r.direction.z << "]}\n"; 
-          return os;
-	}
+    //A handy debug operator
+    friend ostream &operator<<(ostream &os, const Ray &r) {
+        os << "Ray{[" << r.position.x << "," << r.position.y << "," << r.position.z << "],[" << r.direction.x << ","
+           << r.direction.y << "," << r.direction.z << "]}\n";
+        return os;
+    }
 };

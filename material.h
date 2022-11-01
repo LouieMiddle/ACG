@@ -27,25 +27,23 @@
 class Material {
 public:
 
-	// compute_once is called once per intersection
-	virtual Colour compute_once(Ray &viewer, Hit &hit, int recurse)
-	{
-		Colour result;
-		result.r = 0.0f;
-		result.g = 0.0f;
-		result.b = 0.0f;
-		return result;
-	}
+    // compute_once is called once per intersection
+    virtual Colour compute_once(Ray &viewer, Hit &hit, int recurse) {
+        Colour result;
+        result.r = 0.0f;
+        result.g = 0.0f;
+        result.b = 0.0f;
+        return result;
+    }
 
-	// compute_per_light is called for each light that reaches a surface
-	virtual Colour compute_per_light(Vector &viewer, Hit &hit, Vector &ldir)
-	{
-		Colour result;
-		result.r = 0.0f;
-		result.g = 0.0f;
-		result.b = 0.0f;
-		return result;
-	}
+    // compute_per_light is called for each light that reaches a surface
+    virtual Colour compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
+        Colour result;
+        result.r = 0.0f;
+        result.g = 0.0f;
+        result.b = 0.0f;
+        return result;
+    }
 
-	// You will need additional material methods to support Photon-mapping.
+    // You will need additional material methods to support Photon-mapping.
 };

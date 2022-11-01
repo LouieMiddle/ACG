@@ -26,6 +26,7 @@
 class FalseColour : public Material {
 public:
 
-	Colour compute_once(Ray& viewer, Hit& hit, int recurse);
-	Colour compute_per_light(Vector& viewer, Hit& hit, Vector& ldir);
+    Colour compute_once(Ray &viewer, Hit &hit, int recurse);
+
+    Colour compute_per_light(Vector &viewer, Hit &hit, Vector &ldir);
 };

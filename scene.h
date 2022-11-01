@@ -28,28 +28,29 @@
 // Scene is a class that is used to build a scene database of objects
 // and lights and then trace a ray through it.
 
-class Scene: public Environment {
+class Scene : public Environment {
 public:
 
-  Object *object_list;
-  Light *light_list;
+    Object *object_list;
+    Light *light_list;
 
-  Scene();
+    Scene();
 
-  // Filter the list of returned hits to the closest +ve
-  Hit* select_first(Hit* list);
+    // Filter the list of returned hits to the closest +ve
+    Hit *select_first(Hit *list);
 
-  // Trace a ray through the scene and find the closest if any object
-  // intersection in front of the ray.
-  Hit *trace(Ray ray);
-	
-  // Trace a ray through the scene and return its colour. This function
-  // is the one that should recurse down the reflection/refraction tree within a material
-  void raytrace(Ray ray, int recurse, Colour& colour, float& depth);
+    // Trace a ray through the scene and find the closest if any object
+    // intersection in front of the ray.
+    Hit *trace(Ray ray);
 
-  // raytrace a shadow ray.
-  bool shadowtrace(Ray, float limit);
+    // Trace a ray through the scene and return its colour. This function
+    // is the one that should recurse down the reflection/refraction tree within a material
+    void raytrace(Ray ray, int recurse, Colour &colour, float &depth);
 
-  void add_object(Object *obj);
-  void add_light(Light *light);
+    // raytrace a shadow ray.
+    bool shadowtrace(Ray, float limit);
+
+    void add_object(Object *obj);
+
+    void add_light(Light *light);
 };
