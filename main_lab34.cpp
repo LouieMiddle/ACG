@@ -64,16 +64,14 @@ void build_scene(Scene &scene) {
 
     scene.add_light(dl);
 
-//    Phong *bp1 = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-//    Phong *bp2 = new Phong(Colour(0.1f, 0.0f, 0.2f), Colour(0.0f, 0.4f, 0.0f), Colour(0.5f, 0.5f, 0.5f), 40.f);
-    FalseColour *fc1 = new FalseColour();
-    FalseColour *fc2 = new FalseColour();
+    Phong *bp1 = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+    Phong *bp2 = new Phong(Colour(0.01f, 0.01f, 0.01f), Colour(0.0f, 0.0f, 0.0f), Colour(0.5f, 0.5f, 0.5f), 40.f);
 
-    teapot->set_material(fc1);
+    teapot->set_material(bp1);
 
     scene.add_object(teapot);
 
-    sphere->set_material(fc2);
+    sphere->set_material(bp2);
 
     scene.add_object(sphere);
 }
@@ -88,9 +86,7 @@ int main(int argc, char *argv[]) {
     Scene scene;
     build_scene(scene);
 
-//	Camera *camera = new SimpleCamera(0.5f);
-
-    Vertex position = *new Vertex(-1.0f, 0.0f, -3.0f);
+    Vertex position = *new Vertex(-1.0f, 0.0f, 0.0f);
     Vector look_at = *new Vector(1.0f, 0.0f, 1.0f);
     Vector up = *new Vector(0.0f, 1.0f, 0.0f);
     Camera *camera = new FullCamera(0.5f, position, look_at, up);
