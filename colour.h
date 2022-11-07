@@ -22,134 +22,120 @@
 
 class Colour {
 public:
-	float r;
-	float g;
-	float b;
-	float a;
+    float r;
+    float g;
+    float b;
+    float a;
 
-	Colour()
-	{
-		r = 0.0f;
-		g = 0.0f;
-		b = 0.0f;
-		a = 1.0f;
-	}
+    Colour() {
+        r = 0.0f;
+        g = 0.0f;
+        b = 0.0f;
+        a = 1.0f;
+    }
 
-	Colour(float p_r, float p_g, float p_b)
-	{
-		r = p_r;
-		g = p_g;
-		b = p_b;
-		a = 1.0;
-	}
+    Colour(float p_r, float p_g, float p_b) {
+        r = p_r;
+        g = p_g;
+        b = p_b;
+        a = 1.0;
+    }
 
-	Colour(float pr, float pg, float pb, float pa)
-	{
-		r = pr;
-		g = pg;
-		b = pb;
-		a = pa;
-	}
+    Colour(float pr, float pg, float pb, float pa) {
+        r = pr;
+        g = pg;
+        b = pb;
+        a = pa;
+    }
 
-	void scale(Colour &scaling)
-	{
-		r *= scaling.r;
-		g *= scaling.g;
-		b *= scaling.b;
-		a *= scaling.a;
-	}
+    void scale(Colour &scaling) {
+        r *= scaling.r;
+        g *= scaling.g;
+        b *= scaling.b;
+        a *= scaling.a;
+    }
 
-	void add(Colour &adjust)
-	{
-		r += adjust.r;
-		g += adjust.g;
-		b += adjust.b;
-	}
+    void add(Colour &adjust) {
+        r += adjust.r;
+        g += adjust.g;
+        b += adjust.b;
+    }
 
-	Colour operator* (Colour& other)
-	{
-		Colour result;
-		result.r = r * other.r;
-		result.g = g * other.g;
-		result.b = b * other.b;
-		result.a = a * other.a;
-		return result;
-	}
+    Colour operator*(Colour &other) {
+        Colour result;
+        result.r = r * other.r;
+        result.g = g * other.g;
+        result.b = b * other.b;
+        result.a = a * other.a;
+        return result;
+    }
 
-	Colour operator* (Colour other)
-	{
-		Colour result;
-		result.r = r * other.r;
-		result.g = g * other.g;
-		result.b = b * other.b;
-		result.a = a * other.a;
-		return result;
-	}
+    Colour operator*(Colour other) {
+        Colour result;
+        result.r = r * other.r;
+        result.g = g * other.g;
+        result.b = b * other.b;
+        result.a = a * other.a;
+        return result;
+    }
 
-	Colour operator+ (Colour& other)
-	{
-		Colour result;
-		result.r = r + other.r;
-		result.g = g + other.g;
-		result.b = b + other.b;
-		result.a = a + other.a;
-		return result;
-	}
+    Colour operator+(Colour &other) {
+        Colour result;
+        result.r = r + other.r;
+        result.g = g + other.g;
+        result.b = b + other.b;
+        result.a = a + other.a;
+        return result;
+    }
 
 
-	Colour operator+ (Colour other)
-	{
-		Colour result;
-		result.r = r + other.r;
-		result.g = g + other.g;
-		result.b = b + other.b;
-		result.a = a + other.a;
-		return result;
-	}
+    Colour operator+(Colour other) {
+        Colour result;
+        result.r = r + other.r;
+        result.g = g + other.g;
+        result.b = b + other.b;
+        result.a = a + other.a;
+        return result;
+    }
 
-	Colour operator* (float rhs)
-	{
-		Colour result;
-		result.r = r * rhs;
-		result.g = g * rhs;
-		result.b = b * rhs;
-		result.a = a;
-		return result;
-	}
+    Colour operator*(float rhs) {
+        Colour result;
+        result.r = r * rhs;
+        result.g = g * rhs;
+        result.b = b * rhs;
+        result.a = a;
+        return result;
+    }
 
-	Colour operator+= (Colour& other)
-	{
-		r += other.r;
-		g += other.g;
-		b += other.b;
-		a += other.a;
-		return *this;
-	}
+    Colour operator+=(Colour &other) {
+        r += other.r;
+        g += other.g;
+        b += other.b;
+        a += other.a;
+        return *this;
+    }
 
-	Colour operator+= (Colour other)
-	{
-		r += other.r;
-		g += other.g;
-		b += other.b;
-		a += other.a;
-		return *this;
-	}
+    Colour operator+=(Colour other) {
+        r += other.r;
+        g += other.g;
+        b += other.b;
+        a += other.a;
+        return *this;
+    }
 
-	Colour operator*= (Colour& other)
-	{
-		r *= other.r;
-		g *= other.g;
-		b *= other.b;
-		a *= other.a;
-		return *this;
-	}
+    Colour operator*=(Colour &other) {
+        r *= other.r;
+        g *= other.g;
+        b *= other.b;
+        a *= other.a;
+        return *this;
+    }
 
-	Colour operator*= (Colour other)
-	{
-		r *= other.r;
-		g *= other.g;
-		b *= other.b;
-		a *= other.a;
-		return *this;
-	}
+    Colour operator*=(Colour other) {
+        r *= other.r;
+        g *= other.g;
+        b *= other.b;
+        a *= other.a;
+        return *this;
+    }
 };

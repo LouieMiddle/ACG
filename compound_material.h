@@ -25,17 +25,18 @@
 
 class CompoundMaterial : public Material {
 public:
-	int number;
-	Material *materials[10];
+    int number;
+    Material *materials[10];
 
-	// the constructor takes a single parameter, the maximum number of materials to combine.
-	CompoundMaterial(int p_number);
-	~CompoundMaterial();
+    // the constructor takes a single parameter, the maximum number of materials to combine.
+    CompoundMaterial(int p_number);
 
-	// include material added another material to the compound material
-	void include_material(Material *p_new);
+    ~CompoundMaterial();
 
-	Colour compute_once(Ray& viewer, Hit& hit, int recurse);
+    // include material added another material to the compound material
+    void include_material(Material *p_new);
 
-	Colour compute_per_light(Vector& viewer, Hit& hit, Vector& ldir);
+    Colour compute_once(Ray &viewer, Hit &hit, int recurse);
+
+    Colour compute_per_light(Vector &viewer, Hit &hit, Vector &ldir);
 };

@@ -103,11 +103,76 @@ PolyMesh::PolyMesh(char *file, bool smooth) {
     }
 }
 
+Hit *PolyMesh::triangle_intersection(Ray ray, int triangle_index) {
+    Vertex point0 = vertex[triangle[triangle_index][0]];
+    Vertex point1 = vertex[triangle[triangle_index][1]];
+    Vertex point2 = vertex[triangle[triangle_index][2]];
+
+    Vector point0point1 = point1 - point0;
+    Vector point0point2 = point2 - point0;
+
+    Vector normal;
+    point0point1.cross(point0point2, normal);
+
+    float const EPSILON = 0.0000001;
+    float normal_dot_ray_direction = normal.dot(ray.direction);
+    // check if ray and plane are parallel
+    if (fabs(normal_dot_ray_direction) < EPSILON) return 0;
+
+    float d = -normal.dot(point0);
+
+    float t = -(normal.dot(ray.position) + d) / normal_dot_ray_direction;
+    // check if the triangle is in behind the ray
+    if (t < 0) return 0;
+
+    // compute the intersection point
+    Vector P = ray.position + t * ray.direction;
+    Vector C;
+
+    // Check if P is inside triangle boundaries
+    Vector edge0 = point1 - point0;
+    Vector p0 = P - point0;
+    edge0.cross(p0, C);
+    if (normal.dot(C) < 0) return 0;
+
+    // Check if P is inside triangle boundaries
+    Vector edge1 = point2 - point1;
+    Vector p1 = P - point1;
+    edge1.cross(p1, C);
+    if (normal.dot(C) < 0) return 0;
+
+    // Check if P is inside triangle boundaries
+    Vector edge2 = point0 - point2;
+    Vector p2 = P - point2;
+    edge2.cross(p2, C);
+    if (normal.dot(C) < 0) return 0;
+
+    Hit *hit = new Hit();
+    hit->what = this;
+    hit->t = t;
+    hit->entering = true;
+
+    hit->position = ray.position + t * ray.direction;
+    hit->normal = normal;
+
+    return hit;
+}
 
 Hit *PolyMesh::intersection(Ray ray) {
     Hit *hits = 0;
-//BEGIN_STAGE_ONE
-//END_STAGE_ONE
+
+    for (int i = 0; i < triangle_count; i++) {
+        Hit *intersect = triangle_intersection(ray, i);
+
+        if (intersect != 0) {
+            if (hits != 0) {
+                hits->next = intersect;
+            } else {
+                hits = intersect;
+            }
+        }
+    }
+
     return hits;
 }
 

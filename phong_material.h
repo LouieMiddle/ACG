@@ -15,14 +15,15 @@
 class Phong : public Material {
 public:
 //BEGIN_STAGE_ONE
-	Phong(Colour p_ambient, Colour p_diffuse, Colour p_specular, float p_power);
+    Phong(Colour p_ambient, Colour p_diffuse, Colour p_specular, float p_power);
+
 //END_STAGE_ONE
-	Phong()
-	{
+    Phong() {
 
-	}
+    }
 
-	Colour compute_once(Ray& viewer, Hit& hit, int recurse);
-	Colour compute_per_light(Vector& viewer, Hit& hit, Vector& ldir);
+    Colour compute_once(Ray &viewer, Hit &hit, int recurse);
+
+    Colour compute_per_light(Vector &viewer, Hit &hit, Vector &ldir);
 
 };

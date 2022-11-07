@@ -60,7 +60,7 @@ int draw_y_line(FrameBuffer *fb, int sx, int sy, int ex, int ey) {
             y = y + yi;
             d = d + 2 * (dy - dx);
         } else {
-            d = d  + 2 * dy;
+            d = d + 2 * dy;
         }
     }
 

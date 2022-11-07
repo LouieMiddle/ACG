@@ -36,7 +36,6 @@ void SimpleCamera::get_ray_pixel(int p_x, int p_y, Ray &p_ray) {
     p_ray.position.w = 1.0f;
     p_ray.direction.x = (fx - 0.5f);
     p_ray.direction.y = (0.5f - fy);
-    // Distance between the camera position and the plane
     p_ray.direction.z = fov;
     p_ray.direction.normalise();
 }

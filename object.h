@@ -28,33 +28,29 @@
 class Object {
 public:
 
-	Object *next;
-	Material *material;
+    Object *next;
+    Material *material;
 
-	Object()
-	{
-		next = (Object *)0;
-		material = (Material *)0;
-	}
-	
-	// specify the material this object uses
-	virtual void set_material(Material *p_m)
-	{
-		material = p_m;
-	}
+    Object() {
+        next = (Object *) 0;
+        material = (Material *) 0;
+    }
 
-	// Given a ray, if this object intersects it, result all the points of intersection
-	// resturn null if no intersections
-	virtual Hit *intersection(Ray ray)
-	{
-		return 0;
-	}
+    // specify the material this object uses
+    virtual void set_material(Material *p_m) {
+        material = p_m;
+    }
 
-	// apply a transform to this object.
-	virtual void apply_transform(Transform& trans)
-	{
-		return;
-	}
+    // Given a ray, if this object intersects it, result all the points of intersection
+    // resturn null if no intersections
+    virtual Hit *intersection(Ray ray) {
+        return 0;
+    }
+
+    // apply a transform to this object.
+    virtual void apply_transform(Transform &trans) {
+        return;
+    }
 };
 
 #endif

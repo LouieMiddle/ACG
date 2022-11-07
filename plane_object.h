@@ -22,13 +22,13 @@
 
 #include "object.h"
 
-class Plane : public Object
-{
+class Plane : public Object {
 public:
-	float a, b, c, d;
+    float a, b, c, d;
 
-	Plane(float a, float b, float c, float d);
+    Plane(float a, float b, float c, float d);
 
-	Hit* intersection(Ray ray);
-	void apply_transform(Transform& trans);
+    Hit *intersection(Ray ray);
+
+    void apply_transform(Transform &trans);
 };

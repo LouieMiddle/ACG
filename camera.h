@@ -27,17 +27,15 @@
 class Camera {
 public:
 
-	// an empty constructor
-	Camera()
-	{
-	}
+    // an empty constructor
+    Camera() {
+    }
 
-	// Given an environment (typically the derived Scene class, fill in the framebuffer pixels, both colour and depth.
-	virtual void render(Environment& env, FrameBuffer& fb)
-	{
-	}
+    // Given an environment (typically the derived Scene class, fill in the framebuffer pixels, both colour and depth.
+    virtual void render(Environment &env, FrameBuffer &fb) {
+    }
 
-	
+
 };
 
 #endif

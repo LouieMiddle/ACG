@@ -21,18 +21,21 @@
 // and can be treated as infinitely far away.
 
 #pragma once
+
 #include "light.h"
 
 class DirectionalLight : public Light {
 public:
 
-	Vector direction;
-	Colour intensity;
+    Vector direction;
+    Colour intensity;
 
-	DirectionalLight();
-	DirectionalLight(Vector dir, Colour col);
+    DirectionalLight();
 
-	bool get_direction(Vertex &surface, Vector &dir);
-	void get_intensity(Vertex &surface, Colour &intensity);
+    DirectionalLight(Vector dir, Colour col);
+
+    bool get_direction(Vertex &surface, Vector &dir);
+
+    void get_intensity(Vertex &surface, Colour &intensity);
 
 };
