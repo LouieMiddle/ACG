@@ -55,23 +55,25 @@ void build_scene(Scene &scene) {
                                          0.0f, 0.0f, 0.0f, 1.0f);
 
     //  Read in the teapot model.
-    PolyMesh *pm = new PolyMesh("teapot_smaller.ply", false);
-    pm->apply_transform(*transform);
+    PolyMesh *teapot = new PolyMesh("teapot_smaller.ply", false);
+    teapot->apply_transform(*transform);
 
     Sphere *sphere = new Sphere(Vertex(0.0f, 0.0f, 1.0f), 0.4f);
 
-    DirectionalLight *dl = new DirectionalLight(Vector(1.01f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
+    DirectionalLight *dl = new DirectionalLight(Vector(1.0f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
 
     scene.add_light(dl);
 
-    Phong *bp1 = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-    Phong *bp2 = new Phong(Colour(0.1f, 0.0f, 0.2f), Colour(0.0f, 0.4f, 0.0f), Colour(0.5f, 0.5f, 0.5f), 40.f);
+//    Phong *bp1 = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+//    Phong *bp2 = new Phong(Colour(0.1f, 0.0f, 0.2f), Colour(0.0f, 0.4f, 0.0f), Colour(0.5f, 0.5f, 0.5f), 40.f);
+    FalseColour *fc1 = new FalseColour();
+    FalseColour *fc2 = new FalseColour();
 
-    pm->set_material(bp1);
+    teapot->set_material(fc1);
 
-    scene.add_object(pm);
+    scene.add_object(teapot);
 
-    sphere->set_material(bp2);
+    sphere->set_material(fc2);
 
     scene.add_object(sphere);
 }
@@ -81,23 +83,17 @@ void build_scene(Scene &scene) {
 int main(int argc, char *argv[]) {
     int width = 512;
     int height = 512;
-    // Create a framebuffer
     FrameBuffer *fb = new FrameBuffer(width, height);
 
-    // Create a scene
     Scene scene;
-
-    // Setup the scene
     build_scene(scene);
 
-    // Declare a camera
+//	Camera *camera = new SimpleCamera(0.5f);
 
-	Camera *camera = new SimpleCamera(0.5f);
-
-//    Vertex position = *new Vertex(0.0f, 0.0f, 0.0f);
-//    Vector look_at = *new Vector(0.0f, 0.0f, 1.0f);
-//    Vector up = *new Vector(0.0f, 1.0f, 0.0f);
-//    Camera *camera = new FullCamera(0.5f, position, look_at, up);
+    Vertex position = *new Vertex(-1.0f, 0.0f, -3.0f);
+    Vector look_at = *new Vector(1.0f, 0.0f, 1.0f);
+    Vector up = *new Vector(0.0f, 1.0f, 0.0f);
+    Camera *camera = new FullCamera(0.5f, position, look_at, up);
 
     // Camera generates rays for each pixel in the framebuffer and records colour + depth.
     camera->render(scene, *fb);

@@ -33,6 +33,7 @@ public:
     TriangleIndex *triangle;
     bool smoothing;
 
+    Hit *triangle_intersection(Ray ray, int triangle_index);
     Hit *intersection(Ray ray);
 
     void apply_transform(Transform &trans);
