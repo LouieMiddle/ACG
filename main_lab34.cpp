@@ -99,8 +99,6 @@ int main(int argc, char *argv[]) {
     Vector up = *new Vector(0.0f, 1.0f, 0.0f);
     Camera *camera = new FullCamera(0.5f, position, look_at, up);
 
-//    Camera *camera = new SimpleCamera(0.5f);
-
     // Camera generates rays for each pixel in the framebuffer and records colour + depth.
     camera->render(scene, *fb);
 
