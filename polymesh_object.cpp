@@ -153,6 +153,8 @@ Hit *PolyMesh::triangle_intersection(Ray ray, int triangle_index) {
     hit->entering = true;
 
     hit->position = ray.position + t * ray.direction;
+    normal.negate();
+    normal.normalise();
     hit->normal = normal;
 
     return hit;
@@ -165,9 +167,10 @@ Hit *PolyMesh::intersection(Ray ray) {
         Hit *intersect = triangle_intersection(ray, i);
 
         if (intersect != 0) {
-            if (hits != 0) {
-                hits->next = intersect;
-            } else {
+            if (hits == 0) {
+                hits = intersect;
+            } else if (hits->t > intersect->t) {
+                intersect->next = hits;
                 hits = intersect;
             }
         }

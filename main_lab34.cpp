@@ -60,18 +60,26 @@ void build_scene(Scene &scene) {
 
     Sphere *sphere = new Sphere(Vertex(0.0f, 0.0f, 1.0f), 0.4f);
 
-    DirectionalLight *dl = new DirectionalLight(Vector(1.0f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
+    Plane *plane = new Plane(0, 0, 1, -5);
 
-    scene.add_light(dl);
+    DirectionalLight *dl1 = new DirectionalLight(Vector(1.0f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
 
-    Phong *bp1 = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-    Phong *bp2 = new Phong(Colour(0.01f, 0.01f, 0.01f), Colour(0.0f, 0.0f, 0.0f), Colour(0.5f, 0.5f, 0.5f), 40.f);
+    scene.add_light(dl1);
 
-    teapot->set_material(bp1);
+    FalseColour* falseColour = new FalseColour();
+    Phong* red = new Phong(Colour(0.1f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.2f, 0.2f, 0.2f), 40.f);
+    Phong* green = new Phong(Colour(0.0f, 0.1f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.2f, 0.2f, 0.2f), 40.f);
+    Phong* blue = new Phong(Colour(0.0f, 0.0f, 0.1f), Colour(0.0f, 0.0f, 0.4f), Colour(0.2f, 0.2f, 0.2f), 40.f);
+
+    plane->set_material(blue);
+
+    scene.add_object(plane);
+
+    teapot->set_material(red);
 
     scene.add_object(teapot);
 
-    sphere->set_material(bp2);
+    sphere->set_material(green);
 
     scene.add_object(sphere);
 }
@@ -86,10 +94,12 @@ int main(int argc, char *argv[]) {
     Scene scene;
     build_scene(scene);
 
-    Vertex position = *new Vertex(-1.0f, 0.0f, 0.0f);
-    Vector look_at = *new Vector(1.0f, 0.0f, 1.0f);
-    Vector up = *new Vector(0.0f, 1.0f, 0.0f);
-    Camera *camera = new FullCamera(0.5f, position, look_at, up);
+//    Vertex position = *new Vertex(-1.0f, 0.0f, 10.0f);
+//    Vector look_at = *new Vector(1.0f, 0.0f, 1.0f);
+//    Vector up = *new Vector(0.0f, 1.0f, 0.0f);
+//    Camera *camera = new FullCamera(0.5f, position, look_at, up);
+
+    Camera *camera = new SimpleCamera(0.5f);
 
     // Camera generates rays for each pixel in the framebuffer and records colour + depth.
     camera->render(scene, *fb);
