@@ -30,15 +30,13 @@ public:
     int width;
     int height;
     float fov;
-    // the eye position
     Vertex position;
-    // the direction you are looking at (z-axis)
     Vector look_at;
     Vector up;
     Vector right;
     Vector w;
 
-    FullCamera();
+    FullCamera() = default;
 
     FullCamera(float p_f, Vertex &p_position, Vector &p_look_at, Vector &p_up);
 

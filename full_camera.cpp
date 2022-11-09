@@ -18,29 +18,18 @@
 
 #include "full_camera.h"
 
-FullCamera::FullCamera() {
-    // TODO put default values??
-//BEGIN_STAGE_ONE
-//END_STAGE_ONE
-}
-
 FullCamera::FullCamera(float f, Vertex &p_position, Vector &p_look_at, Vector &p_up) {
     fov = f;
     position = p_position;
     look_at = p_look_at;
 
-    // All the operators have been implemented in the vertex and vector classes
     w = position - look_at;
     w.normalise();
 
-    Vector u = Vector(p_up.x, p_up.y, p_up.z);
-    u.cross(w);
-    u.normalise();
-    up = u;
+    p_up.cross(w, up);
+    up.normalise();
 
-    Vector v = Vector(w.x, w.y, w.z);
-    v.cross(u);
-    right = v;
+    w.cross(up, right);
 }
 
 void FullCamera::get_ray_offset(int p_x, int p_y, float p_ox, float p_oy, Ray &p_ray) {
@@ -56,8 +45,8 @@ void FullCamera::get_ray_pixel(int p_x, int p_y, Ray &ray) {
     float xv = (fx - 0.5f);
     float yv = (0.5f - fy);
 
-    Vector direction = xv * up + yv * right - fov * w;
-    ray.direction = direction;
+    ray.direction = xv * up + yv * right - fov * w;
+    ray.direction.normalise();
 }
 
 void FullCamera::render(Environment &env, FrameBuffer &fb) {
