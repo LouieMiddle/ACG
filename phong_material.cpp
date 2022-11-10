@@ -23,23 +23,44 @@
 #include <math.h>
 
 Phong::Phong(Colour p_ambient, Colour p_diffuse, Colour p_specular, float p_power) {
-//BEGIN_STAGE_ONE
-//END_STAGE_ONE
+    ambient = p_ambient;
+    diffuse = p_diffuse;
+    specular = p_specular;
+    power = p_power;
 }
 
 // The compute_once() method supplies the ambient term.
 Colour Phong::compute_once(Ray &viewer, Hit &hit, int recurse) {
     Colour result;
-//BEGIN_STAGE_ONE
-//END_STAGE_ONE
+    result = ambient;
     return result;
 }
 
 // The compute_per_light() method supplies the diffuse and specular terms.
 Colour Phong::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
     Colour result;
-//BEGIN_STAGE_ONE
-//END_STAGE_ONE
+
+    float diff = hit.normal.dot(-ldir);
+
+    // diffuse
+    if (diff > 0.0f) {
+        result.r = diffuse.r * diff;
+        result.g = diffuse.g * diff;
+        result.b = diffuse.b * diff;
+        result.a = diffuse.a * diff;
+    }
+
+    // the specular component
+    Vector r = ldir - (2 * ldir.dot(hit.normal) * hit.normal);
+    float h = r.dot(viewer);
+    float p = pow(h, power);
+    if (p > 0.0f) {
+        result.r += specular.r * p;
+        result.g += specular.g * p;
+        result.b += specular.b * p;
+        result.a += specular.a * p;
+    }
+
     return result;
 }
 

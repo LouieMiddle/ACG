@@ -121,13 +121,18 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
             bool lit;
             lit = light->get_direction(best_hit->position, ldir);
 
+            //light is facing wrong way.
             if (ldir.dot(best_hit->normal) > 0) {
-                lit = false;//light is facing wrong way.
+                lit = false;
             }
 
-            // Put the shadow check here, if lit==true and in shadow, set lit=false
-//BEGIN_STAGE_ONE
-//END_STAGE_ONE
+            Vector shadow_ray_direction = -ldir;
+            Vertex shadow_ray_position = best_hit->position + 0.001f * shadow_ray_direction;
+            Ray shadow_ray = Ray(shadow_ray_position, shadow_ray_direction);
+            bool shadow = shadowtrace(shadow_ray, 10.0f);
+            if (lit && shadow) {
+                lit = false;
+            }
 
             if (lit) {
                 Colour intensity;

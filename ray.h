@@ -32,8 +32,7 @@ public:
     Vertex position;
     Vector direction;
 
-    Ray() {
-    }
+    Ray() = default;
 
     Ray(Vertex p, Vector d) {
         position = p;

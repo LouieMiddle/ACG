@@ -35,7 +35,6 @@ Colour FalseColour::compute_once(Ray &viewer, Hit &hit, int recurse) {
 // The compute_per_light() method makes no contribution.
 Colour FalseColour::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
     Colour result = Colour(0.0f, 0.0f, 0.0f);
-
     return result;
 }
 
