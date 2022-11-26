@@ -103,7 +103,7 @@ PolyMesh::PolyMesh(char *file, bool smooth) {
     }
 }
 
-Hit *PolyMesh::triangle_intersection(Ray ray, int triangle_index) {
+Hit *PolyMesh::triangle_intersection(Ray ray, int triangle_index, float &u, float &v) {
     Vertex point0 = vertex[triangle[triangle_index][0]];
     Vertex point1 = vertex[triangle[triangle_index][1]];
     Vertex point2 = vertex[triangle[triangle_index][2]];
@@ -113,6 +113,7 @@ Hit *PolyMesh::triangle_intersection(Ray ray, int triangle_index) {
 
     Vector normal;
     point0point1.cross(point0point2, normal);
+    float denom = normal.dot(normal);
 
     float const EPSILON = 0.0000001;
     float normal_dot_ray_direction = normal.dot(ray.direction);
@@ -139,13 +140,13 @@ Hit *PolyMesh::triangle_intersection(Ray ray, int triangle_index) {
     Vector edge1 = point2 - point1;
     Vector p1 = P - point1;
     edge1.cross(p1, C);
-    if (normal.dot(C) < 0) return 0;
+    if ((u = normal.dot(C)) < 0) return 0;
 
     // Check if P is inside triangle boundaries
     Vector edge2 = point0 - point2;
     Vector p2 = P - point2;
     edge2.cross(p2, C);
-    if (normal.dot(C) < 0) return 0;
+    if ((v = normal.dot(C)) < 0) return 0;
 
     Hit *hit = new Hit();
     hit->what = this;
@@ -164,7 +165,8 @@ Hit *PolyMesh::intersection(Ray ray) {
     Hit *hits = 0;
 
     for (int i = 0; i < triangle_count; i++) {
-        Hit *intersect = triangle_intersection(ray, i);
+        float u, v;
+        Hit *intersect = triangle_intersection(ray, i, u, v);
 
         if (intersect != 0) {
             if (hits == 0) {

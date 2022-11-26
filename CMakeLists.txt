@@ -8,6 +8,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/teapot_smaller.ply
 
 add_executable(
         Coursework
+        main.cpp
         main_lab1.cpp
         main_lab2.cpp
         main_lab34.cpp
@@ -34,4 +35,4 @@ add_executable(
         scene.cpp scene.h
         simple_camera.cpp simple_camera.h
         sphere_object.cpp sphere_object.h
-)
+        global_material.h global_material.cpp)
