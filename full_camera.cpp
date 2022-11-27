@@ -58,7 +58,7 @@ void FullCamera::render(Environment &env, FrameBuffer &fb) {
             Colour colour = Colour(0.0f, 0.0f, 0.0f, 0.0f);
             float depth = 0.0f;
 
-            env.raytrace(ray, 2, colour, depth);
+            env.raytrace(ray, 5, colour, depth);
 
             fb.plotPixel(x, y, colour.r, colour.g, colour.b);
             fb.plotDepth(x, y, depth);

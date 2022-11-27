@@ -61,7 +61,6 @@ void build_scene(Scene &scene) {
     teapot->apply_transform(*transform);
 
     Sphere *refractive_sphere = new Sphere(Vertex(0.0f, 0.0f, 2.0f), 0.8f);
-    Sphere *reflective_sphere = new Sphere(Vertex(0.0f, 3.0f, 4.0f), 0.5f);
     Sphere *green_sphere = new Sphere(Vertex(2.0f, 2.0f, 3.0f), 0.2f);
 
     Plane *plane = new Plane(0, 0, 1, -6);
@@ -74,8 +73,7 @@ void build_scene(Scene &scene) {
     Phong *red = new Phong(Colour(0.1f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.2f, 0.2f, 0.2f), 40.f);
     Phong *green = new Phong(Colour(0.0f, 0.1f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.2f, 0.2f, 0.2f), 40.f);
     Phong *blue = new Phong(Colour(0.0f, 0.0f, 0.1f), Colour(0.0f, 0.0f, 0.4f), Colour(0.2f, 0.2f, 0.2f), 40.f);
-    GlobalMaterial *reflective_glass = new GlobalMaterial(&scene, 1.52f, true, false);
-    GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f, false, true);
+    GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f);
 
     plane->set_material(blue);
     scene.add_object(plane);
@@ -85,9 +83,6 @@ void build_scene(Scene &scene) {
 
     refractive_sphere->set_material(refractive_glass);
     scene.add_object(refractive_sphere);
-
-    reflective_sphere->set_material(reflective_glass);
-    scene.add_object(reflective_sphere);
 
     green_sphere->set_material(green);
     scene.add_object(green_sphere);

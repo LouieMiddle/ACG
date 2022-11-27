@@ -24,12 +24,10 @@
 
 class GlobalMaterial : public Material {
 public:
-    bool reflective;
-    bool refractive;
     float ior;
     Environment *environment;
 
-    GlobalMaterial(Environment *p_env, float ior, bool p_reflective, bool p_refractive);
+    GlobalMaterial(Environment *p_env, float ior);
 
     void fresnel(Vector &view, Vector &normal, float &kr);
 

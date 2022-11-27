@@ -20,18 +20,19 @@
 
 #include <math.h>
 
-GlobalMaterial::GlobalMaterial(Environment *p_env, float p_ior, bool p_reflective, bool p_refractive) {
+GlobalMaterial::GlobalMaterial(Environment *p_env, float p_ior) {
     environment = p_env;
     ior = p_ior;
-    reflective = p_reflective;
-    refractive = p_refractive;
 }
 
 void GlobalMaterial::fresnel(Vector &view, Vector &normal, float &kr) {
     float cosi = clamp(-1, 1, view.dot(normal));
     float etai = 1, etat = ior;
-    if (cosi > 0) { std::swap(etai, etat); }
-    // Compute sini using Snell's law
+    // The ray starts in the medium that is not air so swap the refractive indexes
+    if (cosi > 0) {
+        std::swap(etai, etat);
+    }
+    // Compute sint using Snell's law
     float sint = etai / etat * sqrtf(std::max(0.f, 1 - cosi * cosi));
 
     // Total internal reflection
@@ -53,6 +54,7 @@ void GlobalMaterial::refract_ray(Vector &view, Vector &normal, Vector &refract_r
     if (cosi < 0) {
         cosi = -cosi;
     } else {
+        // The ray starts in the medium that is not air so swap the refractive indexes and negate normal
         std::swap(etai, etat);
         n = -normal;
     }
@@ -68,29 +70,32 @@ void GlobalMaterial::refract_ray(Vector &view, Vector &normal, Vector &refract_r
 
 // reflection and recursion computation
 Colour GlobalMaterial::compute_once(Ray &viewer, Hit &hit, int recurse) {
-    Colour result;
+    Colour result = Colour(0.0f, 0.0f, 0.0f);
 
-    if (reflective && recurse > 0) {
-        Ray reflected_ray;
-        reflected_ray.direction = viewer.direction - 2 * hit.normal.dot(viewer.direction) * hit.normal;
-        reflected_ray.direction.normalise();
-        reflected_ray.position = hit.position + (0.0001f * reflected_ray.direction);
-        environment->raytrace(reflected_ray, recurse - 1, result, hit.t);
-    }
-    if (refractive && recurse > 0) {
+    if (recurse > 0) {
         float kr;
         fresnel(viewer.direction, hit.normal, kr);
 
         bool outside = viewer.direction.dot(hit.normal) < 0;
+
         Vector bias = 0.0001f * hit.normal;
+
+        Colour refract_colour;
         if (kr < 1) {
             Ray refraction_ray;
             refract_ray(viewer.direction, hit.normal, refraction_ray.direction);
             refraction_ray.position = outside ? hit.position - bias : hit.position + bias;
-            environment->raytrace(refraction_ray, recurse - 1, result, hit.t);
+            environment->raytrace(refraction_ray, recurse - 1, refract_colour, hit.t);
         }
 
-        result = result * (1 - kr);
+        Ray reflected_ray;
+        Colour reflect_colour;
+        reflected_ray.direction = viewer.direction - 2 * hit.normal.dot(viewer.direction) * hit.normal;
+        reflected_ray.direction.normalise();
+        reflected_ray.position = outside ? hit.position - (0.0001f * reflected_ray.direction) : hit.position + (0.0001f * reflected_ray.direction);
+        environment->raytrace(reflected_ray, recurse - 1, reflect_colour, hit.t);
+
+        result = result + reflect_colour * kr + refract_colour * (1 - kr);
     }
 
     return result;
