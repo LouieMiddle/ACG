@@ -16,28 +16,27 @@
 * produced it.
 */
 
-// The PolyMesh Object reads and intersects with triangle meshes
-
+// The global material generates a reflection/refraction layer
 #pragma once
 
-#include "object.h"
+#include "material.h"
+#include "environment.h"
 
-typedef int TriangleIndex[3];
-
-class PolyMesh : public Object {
+class GlobalMaterial : public Material {
 public:
-    int vertex_count;
-    int triangle_count;
-    Vertex *vertex;
-    TriangleIndex *triangle;
+    float ior;
+    Environment *environment;
 
-    Hit *triangle_intersection(Ray ray, int triangle_index, float &u, float &v);
+    GlobalMaterial(Environment *p_env, float ior);
 
-    Hit *intersection(Ray ray);
+    void fresnel(Vector &view, Vector &normal, float &kr);
 
-    void apply_transform(Transform &trans);
+    void refract_ray(Vector &view, Vector &normal, Vector &refract_ray);
 
-    PolyMesh(char *file, bool smooth);
+    Colour compute_once(Ray &viewer, Hit &hit, int recurse);
 
-    PolyMesh() = default;
+    Colour compute_per_light(Vector &viewer, Hit &hit, Vector &ldir);
+
+    float clamp(float lower, float upper, float number);
 };
+

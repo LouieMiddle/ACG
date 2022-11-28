@@ -32,11 +32,6 @@ FullCamera::FullCamera(float f, Vertex &p_position, Vector &p_look_at, Vector &p
     w.cross(up, right);
 }
 
-void FullCamera::get_ray_offset(int p_x, int p_y, float p_ox, float p_oy, Ray &p_ray) {
-//BEGIN_STAGE_ONE
-// END_STAGE_ONE
-}
-
 void FullCamera::get_ray_pixel(int p_x, int p_y, Ray &ray) {
     ray.position = position;
 
@@ -60,8 +55,8 @@ void FullCamera::render(Environment &env, FrameBuffer &fb) {
 
             get_ray_pixel(x, y, ray);
 
-            Colour colour;
-            float depth;
+            Colour colour = Colour(0.0f, 0.0f, 0.0f, 0.0f);
+            float depth = 0.0f;
 
             env.raytrace(ray, 5, colour, depth);
 
