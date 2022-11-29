@@ -54,6 +54,7 @@ Hit *Scene::trace(Ray ray) {
         if (hit != 0) {
             if (best_hit == 0) {
                 best_hit = hit;
+
             } else if (hit->t < best_hit->t) {
                 delete best_hit;
                 best_hit = hit;
@@ -93,6 +94,16 @@ Hit *Scene::select_first(Hit *list) {
 }
 
 void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
+    Object *objects = object_list;
+    Light *lights = light_list;
+
+    // a default colour if we hit nothing.
+    colour.r = 0.0f;
+    colour.g = 0.0f;
+    colour.b = 0.0f;
+    colour.a = 0.0f;
+    depth = 0.0f;
+
     // first step, find the closest primitive
     Hit *best_hit = this->trace(ray);
 
@@ -114,25 +125,32 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
             bool lit;
             lit = light->get_direction(best_hit->position, ldir);
 
-            //light is facing wrong way.
             if (ldir.dot(best_hit->normal) > 0) {
-                lit = false;
+                lit = false;//light is facing wrong way.
             }
 
-            Vector shadow_ray_direction = -ldir;
-            Vertex shadow_ray_position = best_hit->position + 0.001f * shadow_ray_direction;
-            Ray shadow_ray = Ray(shadow_ray_position, shadow_ray_direction);
-            bool shadow = shadowtrace(shadow_ray, 10.0f);
-            if (lit && shadow) {
-                lit = false;
+            // Put the shadow check here, if lit==true and in shadow, set lit=false
+
+            if (lit) {
+                Ray shadow_ray;
+
+                shadow_ray.direction = -ldir;
+
+                shadow_ray.position = best_hit->position + (0.0001f * shadow_ray.direction);
+
+                if (this->shadowtrace(shadow_ray, 1000000000.0f)) {
+                    lit = false; //there's a shadow so no lighting, if realistically close
+                }
             }
+
 
             if (lit) {
                 Colour intensity;
+
                 light->get_intensity(best_hit->position, intensity);
+
                 colour = colour + intensity * best_hit->what->material->compute_per_light(viewer, *best_hit,
                                                                                           ldir); // this is the per light local contrib e.g. diffuse, specular
-
             }
 
             light = light->next;

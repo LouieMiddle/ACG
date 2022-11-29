@@ -31,7 +31,7 @@ public:
     // the constructor takes a single parameter, the maximum number of materials to combine.
     CompoundMaterial(int p_number);
 
-    ~CompoundMaterial();
+    CompoundMaterial() = default;
 
     // include material added another material to the compound material
     void include_material(Material *p_new);

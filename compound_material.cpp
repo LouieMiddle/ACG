@@ -28,9 +28,6 @@ CompoundMaterial::CompoundMaterial(int p_number) {
     }
 }
 
-CompoundMaterial::~CompoundMaterial() {
-}
-
 void CompoundMaterial::include_material(Material *p_new) {
     for (int i = 0; i < number; i += 1) {
         if (materials[i] == 0) {
@@ -65,4 +62,3 @@ Colour CompoundMaterial::compute_per_light(Vector &viewer, Hit &hit, Vector &ldi
 
     return result;
 }
-

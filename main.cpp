@@ -44,7 +44,6 @@
 #include "simple_camera.h"
 #include "full_camera.h"
 #include "global_material.h"
-#include "compound_material.h"
 
 using namespace std;
 
@@ -57,47 +56,49 @@ void build_scene(Scene &scene) {
                                          0.0f, 0.0f, 0.0f, 1.0f);
 
     //  Read in the teapot model.
-    PolyMesh *teapot = new PolyMesh("teapot_smaller.ply", false);
+    PolyMesh *teapot = new PolyMesh("teapot_smaller.ply", true);
     teapot->apply_transform(*transform);
 
-    Sphere *refractive_sphere = new Sphere(Vertex(0.0f, 0.0f, 2.0f), 0.8f);
-    Sphere *green_sphere = new Sphere(Vertex(2.0f, 2.0f, 3.0f), 0.2f);
+    Sphere *refractive_sphere = new Sphere(Vertex(0.0f, 0.0f, 1.0f), 0.4f);
+    Sphere *reflective_sphere = new Sphere(Vertex(0.0f, 2.0f, 3.0f), 0.6f);
+    Plane *blue_plane = new Plane(0.0f, 0.0f, 1.0f, -5);
 
-    Plane *plane = new Plane(0, 0, 1, -6);
+    DirectionalLight *dl = new DirectionalLight(Vector(1.01f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
 
-    DirectionalLight *dl1 = new DirectionalLight(Vector(1.0f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
+    scene.add_light(dl);
 
-    scene.add_light(dl1);
-
-    FalseColour *false_colour = new FalseColour();
-    Phong *red = new Phong(Colour(0.1f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.2f, 0.2f, 0.2f), 40.f);
-    Phong *green = new Phong(Colour(0.0f, 0.1f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.2f, 0.2f, 0.2f), 40.f);
-    Phong *blue = new Phong(Colour(0.0f, 0.0f, 0.1f), Colour(0.0f, 0.0f, 0.4f), Colour(0.2f, 0.2f, 0.2f), 40.f);
-    GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f);
-
-    plane->set_material(blue);
-    scene.add_object(plane);
+    Phong *red = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+    Phong *blue = new Phong(Colour(0.0f, 0.0f, 0.2f), Colour(0.0f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+    GlobalMaterial *refractive = new GlobalMaterial(&scene, 1.52f, true);
+    GlobalMaterial *reflective = new GlobalMaterial(&scene, 1.52f, false);
 
     teapot->set_material(red);
     scene.add_object(teapot);
 
-    refractive_sphere->set_material(refractive_glass);
+    refractive_sphere->set_material(refractive);
+    reflective_sphere->set_material(reflective);
     scene.add_object(refractive_sphere);
+    scene.add_object(reflective_sphere);
 
-    green_sphere->set_material(green);
-    scene.add_object(green_sphere);
+    blue_plane->set_material(blue);
+    scene.add_object(blue_plane);
 }
 
 
-//// This is the entry point function to the program.
+// This is the entry point function to the program.
 int main(int argc, char *argv[]) {
     int width = 512;
     int height = 512;
+    // Create a framebuffer
     FrameBuffer *fb = new FrameBuffer(width, height);
 
+    // Create a scene
     Scene scene;
+
+    // Setup the scene
     build_scene(scene);
 
+    // Declare a camera
     Vertex position = *new Vertex(0.0f, 0.0f, 0.0f);
     Vector look_at = *new Vector(0.0f, 0.0f, 1.0f);
     Vector up = *new Vector(0.0f, 1.0f, 0.0f);

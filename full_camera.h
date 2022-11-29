@@ -16,7 +16,7 @@
 * produced it.
 */
 
-// Full camera allows a camera to be placed in space with a look_at and up direction
+// Full camera allows a camera to be placed in space with a lookat and up direction
 // as well as the field of view. It loops over the pixels in a framebuffer and computes
 // a ray that is then passed to the environment.
 
@@ -31,14 +31,15 @@ public:
     int height;
     float fov;
     Vertex position;
-    Vector look_at;
+    Vector lookat;
     Vector up;
     Vector right;
-    Vector w;
 
-    FullCamera() = default;
+    FullCamera();
 
-    FullCamera(float p_f, Vertex &p_position, Vector &p_look_at, Vector &p_up);
+    FullCamera(float p_f, Vertex &p_position, Vector &p_lookat, Vector &p_up);
+
+    void get_ray_offset(int p_x, int p_y, float p_ox, float p_oy, Ray &p_ray);
 
     void get_ray_pixel(int p_x, int p_y, Ray &ray);
 

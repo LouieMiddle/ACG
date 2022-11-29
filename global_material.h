@@ -25,9 +25,10 @@
 class GlobalMaterial : public Material {
 public:
     float ior;
+    bool transmissive;
     Environment *environment;
 
-    GlobalMaterial(Environment *p_env, float ior);
+    GlobalMaterial(Environment *p_env, float ior, bool transmissive);
 
     void fresnel(Vector &view, Vector &normal, float &kr);
 

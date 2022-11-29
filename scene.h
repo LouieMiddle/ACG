@@ -30,7 +30,6 @@
 
 class Scene : public Environment {
 public:
-
     Object *object_list;
     Light *light_list;
 

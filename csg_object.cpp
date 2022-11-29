@@ -15,27 +15,21 @@
 * the code, consider generating an incredible image and explaining how you
 * produced it.
 */
-// Environment is the base class for raytracing. We use this in material to do recursion as that allows
-// Scene which is derived from this to depend (indirectly) on Material.
 
-#pragma once
+/* CSG is an object that is built by Constructive Solid Geometry from two sub-objects.*/
 
-#include "ray.h"
-#include "colour.h"
+using namespace std;
 
-class Environment {
-public:
-    // shoot a ray into the environment and get the colour and depth.
-    // recurse indicates the level of recursion permitted.
-    virtual void raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
-        colour.r = 0.0f;
-        colour.g = 0.0f;
-        colour.b = 0.0f;
-        depth = 100000000.0f;
-    }
+#include "csg_object.h"
 
-    // raytrace a shadow ray. returns true if intersection found between 0 and limit along ray.
-    virtual bool shadowtrace(Ray, float limit) {
-        return false;
-    }
-};
+CSG::CSG(CSG::Mode p_mode, Object *p_left, Object *p_right) {
+    next = (Object *) 0;
+}
+
+Hit *CSG::intersection(Ray ray) {
+    Hit *result = 0;
+    return result;
+}
+
+void CSG::apply_transform(Transform &transform) {
+}

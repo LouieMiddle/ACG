@@ -13,7 +13,7 @@ add_executable(
         main_lab2.cpp
         main_lab34.cpp
         framebuffer.cpp framebuffer.h
-        linedrawer.cpp linedrawer.h
+        linedrawer.cpp linedrawer_int.cpp linedrawer.h
         polymesh_object.cpp polymesh_object.h
         hit.cpp hit.h
         transform.h
@@ -35,4 +35,7 @@ add_executable(
         scene.cpp scene.h
         simple_camera.cpp simple_camera.h
         sphere_object.cpp sphere_object.h
-        global_material.h global_material.cpp)
+        global_material.h global_material.cpp
+        quadratic_object.h quadratic_object.cpp
+        csg_object.h csg_object.cpp
+        photon.h)

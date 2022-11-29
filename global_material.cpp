@@ -20,11 +20,13 @@
 
 #include <math.h>
 
-GlobalMaterial::GlobalMaterial(Environment *p_env, float p_ior) {
+GlobalMaterial::GlobalMaterial(Environment *p_env, float p_ior, bool p_transmissive) {
     environment = p_env;
     ior = p_ior;
+    transmissive = p_transmissive;
 }
 
+// TODO: Cite scratch a pixel
 void GlobalMaterial::fresnel(Vector &view, Vector &normal, float &kr) {
     float cosi = clamp(-1, 1, view.dot(normal));
     float etai = 1, etat = ior;
@@ -47,6 +49,7 @@ void GlobalMaterial::fresnel(Vector &view, Vector &normal, float &kr) {
     }
 }
 
+// TODO: Cite scratch a pixel
 void GlobalMaterial::refract_ray(Vector &view, Vector &normal, Vector &refract_ray) {
     float cosi = clamp(-1, 1, view.dot(normal));
     float etai = 1, etat = ior;
@@ -80,22 +83,23 @@ Colour GlobalMaterial::compute_once(Ray &viewer, Hit &hit, int recurse) {
 
         Vector bias = 0.0001f * hit.normal;
 
-        Colour refract_colour;
-        if (kr < 1) {
-            Ray refraction_ray;
-            refract_ray(viewer.direction, hit.normal, refraction_ray.direction);
-            refraction_ray.position = outside ? hit.position - bias : hit.position + bias;
-            environment->raytrace(refraction_ray, recurse - 1, refract_colour, hit.t);
-        }
-
         Ray reflected_ray;
         Colour reflect_colour;
         reflected_ray.direction = viewer.direction - 2 * hit.normal.dot(viewer.direction) * hit.normal;
         reflected_ray.direction.normalise();
-        reflected_ray.position = outside ? hit.position - (0.0001f * reflected_ray.direction) : hit.position + (0.0001f * reflected_ray.direction);
+        reflected_ray.position = outside ? hit.position + bias : hit.position - bias;
         environment->raytrace(reflected_ray, recurse - 1, reflect_colour, hit.t);
 
-        result = result + reflect_colour * kr + refract_colour * (1 - kr);
+        result = transmissive ? result + reflect_colour * kr : result + reflect_colour * 0.8;
+
+        Colour refract_colour;
+        if (transmissive && kr < 1) {
+            Ray refraction_ray;
+            refract_ray(viewer.direction, hit.normal, refraction_ray.direction);
+            refraction_ray.position = outside ? hit.position - bias : hit.position + bias;
+            environment->raytrace(refraction_ray, recurse - 1, refract_colour, hit.t);
+            result = result + refract_colour * (1 - kr);
+        }
     }
 
     return result;

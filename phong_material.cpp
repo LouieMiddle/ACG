@@ -32,7 +32,9 @@ Phong::Phong(Colour p_ambient, Colour p_diffuse, Colour p_specular, float p_powe
 // The compute_once() method supplies the ambient term.
 Colour Phong::compute_once(Ray &viewer, Hit &hit, int recurse) {
     Colour result;
+
     result = ambient;
+
     return result;
 }
 
@@ -40,27 +42,47 @@ Colour Phong::compute_once(Ray &viewer, Hit &hit, int recurse) {
 Colour Phong::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
     Colour result;
 
-    float diff = hit.normal.dot(-ldir);
+    float diff;
 
-    // diffuse
-    if (diff > 0.0f) {
-        result.r = diffuse.r * diff;
-        result.g = diffuse.g * diff;
-        result.b = diffuse.b * diff;
-        result.a = diffuse.a * diff;
+    Vector tolight;
+    Vector toviewer;
+
+    result.r = 0.0f;
+    result.g = 0.0f;
+    result.b = 0.0f;
+
+    tolight = ldir;
+    tolight.negate();
+
+    toviewer = viewer;
+    toviewer.negate();
+
+    diff = hit.normal.dot(tolight);
+
+    // Scene.raytrace() does this test, but let's keep it here in case that changes or we get called from elsewhere.
+    if (diff < 0.0f) // light is behind surface
+    {
+        return result;
     }
 
+    // diffuse
+
+    result += diffuse * diff;
+
     // the specular component
-    Vector r = ldir - (2 * ldir.dot(hit.normal) * hit.normal);
-    float h = r.dot(viewer);
-    float p = pow(h, power);
-    if (p > 0.0f) {
-        result.r += specular.r * p;
-        result.g += specular.g * p;
-        result.b += specular.b * p;
-        result.a += specular.a * p;
+
+    Vector r;
+
+    hit.normal.reflection(tolight, r);
+    r.normalise();
+
+    float h = r.dot(toviewer);
+
+    if (h > 0.0f) {
+        float p = (float) pow(h, power);
+
+        result += specular * p;
     }
 
     return result;
 }
-

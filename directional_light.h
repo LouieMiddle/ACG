@@ -26,7 +26,6 @@
 
 class DirectionalLight : public Light {
 public:
-
     Vector direction;
     Colour intensity;
 
@@ -37,5 +36,4 @@ public:
     bool get_direction(Vertex &surface, Vector &dir);
 
     void get_intensity(Vertex &surface, Colour &intensity);
-
 };

@@ -62,7 +62,6 @@ public:
         return x * other.x + y * other.y + z * other.z;
     }
 
-
     void reflection(Vector initial, Vector &reflect) {
         float d;
 
@@ -103,7 +102,6 @@ public:
         return *this;
     }
 
-
     Vector operator*(const Vector &b) {
         Vector r;
         r.x = this->x * b.x;
@@ -130,7 +128,6 @@ public:
 
         return r;
     }
-
 
     Vector operator*(float &b) {
         Vector r;

@@ -41,9 +41,7 @@ public:
 
     // Get the intensity of the light in the direction of the surface
     virtual void get_intensity(Vertex &surface, Colour &intensity) {
-
     }
 
-    // You will need additional light methods to support Photon-mapping.
-
+    // TODO: You will need additional light methods to support Photon-mapping.
 };

@@ -50,8 +50,8 @@ void SimpleCamera::render(Environment &env, FrameBuffer &fb) {
 
             get_ray_pixel(x, y, ray);
 
-            Colour colour = Colour(0.0f, 0.0f, 0.0f, 0.0f);
-            float depth = 0.0f;
+            Colour colour;
+            float depth;
 
             env.raytrace(ray, 5, colour, depth);
 
