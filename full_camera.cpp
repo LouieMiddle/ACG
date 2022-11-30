@@ -66,8 +66,8 @@ void FullCamera::render(Environment &env, FrameBuffer &fb) {
 
             get_ray_pixel(x, y, ray);
 
-            Colour colour;
-            float depth;
+            Colour colour = Colour(0.0f, 0.0f, 0.0f);
+            float depth = 0.0f;
 
             env.raytrace(ray, 5, colour, depth);
 

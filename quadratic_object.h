@@ -30,4 +30,6 @@ public:
     Hit *intersection(Ray ray);
 
     void apply_transform(Transform &trans);
+
+    Vector calc_normal(Vertex intersection);
 };

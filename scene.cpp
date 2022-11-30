@@ -94,16 +94,6 @@ Hit *Scene::select_first(Hit *list) {
 }
 
 void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
-    Object *objects = object_list;
-    Light *lights = light_list;
-
-    // a default colour if we hit nothing.
-    colour.r = 0.0f;
-    colour.g = 0.0f;
-    colour.b = 0.0f;
-    colour.a = 0.0f;
-    depth = 0.0f;
-
     // first step, find the closest primitive
     Hit *best_hit = this->trace(ray);
 

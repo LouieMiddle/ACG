@@ -24,15 +24,22 @@
 
 #include "object.h"
 
-class CSG : public Object {
-public:
-    enum Mode {
-        CSG_UNION = 0,
-        CSG_INTER = 1,
-        CSG_DIFF = 2
-    };
+enum Mode {
+    CSG_UNION = 0,
+    CSG_INTER = 1,
+    CSG_DIFF = 2
+};
 
-    CSG(CSG::Mode p_mode, Object *p_left, Object *p_right);
+class CSG : public Object {
+    Mode mode;
+    Object *left;
+    Object *right;
+public:
+    CSG(Mode p_mode, Object *p_left, Object *p_right);
+
+    bool operation_allowed(bool lhit, bool inl, bool  inr);
+
+    Hit *filter_hits(Hit *hits);
 
     Hit *intersection(Ray ray);
 
