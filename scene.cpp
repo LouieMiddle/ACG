@@ -54,7 +54,6 @@ Hit *Scene::trace(Ray ray) {
         if (hit != 0) {
             if (best_hit == 0) {
                 best_hit = hit;
-
             } else if (hit->t < best_hit->t) {
                 delete best_hit;
                 best_hit = hit;

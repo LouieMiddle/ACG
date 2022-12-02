@@ -30,10 +30,10 @@ enum Mode {
     CSG_DIFF = 2
 };
 
+static const char *CSG_TYPE = "3CSG";
+
 class CSG : public Object {
     Mode mode;
-    Object *left;
-    Object *right;
 public:
     CSG(Mode p_mode, Object *p_left, Object *p_right);
 
@@ -44,4 +44,7 @@ public:
     Hit *intersection(Ray ray);
 
     void apply_transform(Transform &transform);
+
+    Object *left;
+    Object *right;
 };

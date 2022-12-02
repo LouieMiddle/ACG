@@ -20,62 +20,87 @@
 
 using namespace std;
 
+#include <string.h>
 #include "csg_object.h"
 
-// TODO: Cite https://www.geeksforgeeks.org/merge-k-sorted-linked-lists/
-// Takes two lists of hits sorted in increasing order, and merge their hits together to make one big sorted hit.
-Hit *SortedMerge(Hit *a, Hit *b) {
-    Hit *result = 0;
+Hit *merge(Hit *head1, Hit *head2) {
+    if (head1 == 0)
+        return head2;
+    if (head2 == 0)
+        return head1;
 
-    /* Base cases */
-    if (a == 0)
-        return (b);
-    else if (b == 0)
-        return (a);
-
-    /* Pick either a or b, and recur */
-    if (a->t <= b->t) {
-        result = a;
-        result->next = SortedMerge(a->next, b);
+    Hit *temp;
+    if (head1->t < head2->t) {
+        temp = head1;
+        temp->next = merge(head1->next, head2);
     } else {
-        result = b;
-        result->next = SortedMerge(a, b->next);
+        temp = head2;
+        temp->next = merge(head1, head2->next);
     }
 
-    return result;
+    return temp;
 }
 
-// TODO: Cite https://www.geeksforgeeks.org/merge-k-sorted-linked-lists/
-// Takes an array of lists and generates sorted output of hits
-Hit *mergeKLists(Hit *arr[], int last) {
-    // repeat until only one list is left
-    while (last != 0) {
-        int i = 0, j = last;
+Hit *mid_point(Hit *head) {
+    if (head == 0 || head->next == 0)
+        return head;
 
-        // (i, j) forms a pair
-        while (i < j) {
-            // merge List i with List j and store
-            // merged list in List i
-            arr[i] = SortedMerge(arr[i], arr[j]);
+    Hit *fast = head;
+    Hit *slow = head;
 
-            // consider next pair
-            i++, j--;
+    while (fast != 0 && fast->next != 0) {
+        fast = fast->next;
 
-            // If all pairs are merged, update last
-            if (i >= j)
-                last = j;
-        }
+        if (fast->next == 0)
+            break;
+
+        fast = fast->next;
+        slow = slow->next;
     }
 
-    return arr[0];
+    return slow;
+}
+
+// TODO: Cite https://codeforgeek.com/sort-linked-lists-cpp/
+// TODO: Add to utils class
+Hit *merge_sort(Hit *head) {
+    if (head == 0 || head->next == 0)
+        return head;
+
+    Hit *mid = mid_point(head);
+    Hit *a = head;
+    Hit *b = mid->next;
+
+    mid->next = 0;
+
+    a = merge_sort(a);
+    b = merge_sort(b);
+
+    Hit *c = merge(a, b);
+
+    return c;
+}
+
+// TODO: Cite https://www.geeksforgeeks.org/cpp-program-for-inserting-a-node-in-a-linked-list/
+// TODO: Add to utils class
+void append(Hit **head_ref, Hit *new_data) {
+    Hit *last = *head_ref;
+
+    if (*head_ref == 0) {
+        *head_ref = new_data;
+        return;
+    }
+
+    while (last->next != 0)
+        last = last->next;
+
+    last->next = new_data;
 }
 
 CSG::CSG(Mode p_mode, Object *p_left, Object *p_right) {
     mode = p_mode;
     left = p_left;
     right = p_right;
-    left->parent = this;
-    right->parent = this;
 }
 
 bool CSG::operation_allowed(bool lhit, bool inl, bool inr) {
@@ -90,43 +115,108 @@ bool CSG::operation_allowed(bool lhit, bool inl, bool inr) {
     return false;
 }
 
+bool includes_csg(CSG *parent, Object *child) {
+    if (parent->left == child) {
+        return true;
+    }
+    if (parent->right == child) {
+        return true;
+    }
+
+    bool result = false;
+    if (strcmp(typeid(*parent->left).name(), CSG_TYPE) == 0) {
+        result = includes_csg(dynamic_cast<CSG*>(parent->left), child);
+    }
+    if (strcmp(typeid(*parent->right).name(), CSG_TYPE) == 0 && !result) {
+        result = includes_csg(dynamic_cast<CSG*>(parent->right), child);
+    }
+
+    return result;
+}
+
+bool includes(Object *parent, Object *child) {
+    if (parent == child) {
+        return true;
+    }
+
+    if (strcmp(typeid(*parent).name(), CSG_TYPE) == 0) {
+        return includes_csg(dynamic_cast<CSG*>(parent), child);
+    }
+
+    return false;
+}
+
 Hit *CSG::filter_hits(Hit *hits) {
     bool inl = false;
     bool inr = false;
 
-    Hit *tmp = 0;
+    Hit *result = 0;
 
     while (hits != 0) {
-        bool lhit = hits->what == left;
+        bool l_hit = includes(left, hits->what);
 
-        if (operation_allowed(lhit, inl, inr)) {
-            if (tmp == 0) {
-                tmp = hits;
+        if (operation_allowed(l_hit, inl, inr)) {
+            if (result == 0) {
+                result = hits;
+                hits = hits->next;
+                result->next = 0;
             } else {
-                tmp->next = hits;
+                Hit *temp = hits;
+                hits = hits->next;
+                temp->next = 0;
+                append(&result, temp);
             }
+        } else {
+            Hit *temp = hits;
+            hits = hits->next;
+            delete temp;
         }
 
-        if (lhit) {
+        if (l_hit) {
             inl = !inl;
         } else {
             inr = !inr;
         }
-
-        hits = hits->next;
     }
 
-    return tmp;
+    return result;
+}
+
+// TODO: Add to utils
+void printlist(Hit *head) {
+    while (head != 0) {
+        cout << head->t << " ";
+        head = head->next;
+    }
+    cout << endl;
 }
 
 Hit *CSG::intersection(Ray ray) {
-    Hit *hits[2];
-    hits[0] = left->intersection(ray);
-    hits[1] = right->intersection(ray);
-    Hit *first_hit = mergeKLists(hits, 1);
+    Hit *hits = left->intersection(ray);
+    append(&hits, right->intersection(ray));
 
-    return filter_hits(first_hit);
+//    cout << "Given Linked List is " << endl;
+//    printlist(hits);
+
+    hits = merge_sort(hits);
+
+//    cout << "Sorted Linked List is " << endl;
+//    printlist(hits);
+
+//    Hit *tmp = hits;
+//    int count = 0;
+//    while (tmp !=  0) {
+//        tmp = tmp->next;
+//        count++;
+//    }
+//    if (count > 100) {
+//        printf("here");
+//    }
+
+    return filter_hits(hits);
 }
 
 void CSG::apply_transform(Transform &transform) {
+    left->apply_transform(transform);
+    right->apply_transform(transform);
 }

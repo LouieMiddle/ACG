@@ -57,10 +57,10 @@ void build_scene(Scene &scene) {
                                            0.0f, 1.0f, 0.0f, 10.0f,
                                            0.0f, 0.0f, 0.0f, 1.0f);
 
-    Transform *move_quadratic = new Transform(1.0f, 0.0f, 0.0f, 1.0f,
-                                              0.0f, 1.0f, 0.0f, -1.0f,
-                                              0.0f, 0.0f, 1.0f, 2.0f,
-                                              0.0f, 0.0f, 0.0f, 1.0f);
+    Transform *rotate_180 = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
+                                          0.0f, -1.0f, 0.0f, 0.0f,
+                                          0.0f, 0.0f, -1.0f, 0.0f,
+                                          0.0f, 0.0f, 0.0f, 1.0f);
 
     //  Read in the teapot model.
     PolyMesh *teapot = new PolyMesh("teapot_smaller.ply", true);
@@ -75,7 +75,6 @@ void build_scene(Scene &scene) {
     Quadratic *quadratic_sphere = new Quadratic(2.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 5.0f, 0.0f, -1.0f);
     // Hyperboloid of one sheet with axis of symmetry at the x-axis
     Quadratic *quadratic_hyperboloid = new Quadratic(-3.0f, 0.0f, 0.0f, 0.0f, 6.0f, 0.0f, 0.0f, 6.0f, 0.0f, -1.0f);
-//    quadratic_sphere->apply_transform(*move_quadratic);
 
     DirectionalLight *dl = new DirectionalLight(Vector(1.01f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
 
@@ -84,6 +83,9 @@ void build_scene(Scene &scene) {
     Phong *red = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
     Phong *green = new Phong(Colour(0.0f, 0.2f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
     Phong *blue = new Phong(Colour(0.0f, 0.0f, 0.2f), Colour(0.0f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+    Phong *yellow = new Phong(Colour(0.2f, 0.2f, 0.0f), Colour(0.4f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+    Phong *purple = new Phong(Colour(0.2f, 0.0f, 0.2f), Colour(0.4f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+    Phong *light_blue = new Phong(Colour(0.0f, 0.2f, 0.2f), Colour(0.0f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
     GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f, true);
     GlobalMaterial *reflective_glass = new GlobalMaterial(&scene, 1.52f, false);
 
@@ -105,14 +107,28 @@ void build_scene(Scene &scene) {
 //    scene.add_object(quadratic_sphere);
 //    scene.add_object(quadratic_hyperboloid);
 
-    Sphere *red_sphere = new Sphere(Vertex(1.0, 0.0f, 3.0f), 2.0f);
-    Sphere *blue_sphere = new Sphere(Vertex(-1.0f, 0.0f, 3.0f), 2.0f);
+    Sphere *red_sphere = new Sphere(Vertex(-0.2f, 0.0f, 1.0f), 0.5f);
+    Sphere *blue_sphere = new Sphere(Vertex(0.0f, 0.0f, 1.0f), 0.5f);
+    Sphere *green_sphere = new Sphere(Vertex(0.2f, 0.0f, 1.0f), 0.5f);
     blue_sphere->set_material(blue);
     red_sphere->set_material(red);
-    CSG *csg = new CSG(CSG_DIFF, blue_sphere, red_sphere);
-    scene.add_object(csg);
-//    scene.add_object(red_sphere);
-//    scene.add_object(blue_sphere);
+    green_sphere->set_material(green);
+    CSG *blue_diff_red = new CSG(CSG_DIFF, blue_sphere, red_sphere);
+//    blue_diff_red->apply_transform(*rotate_180);
+//    scene.add_object(blue_diff_red);
+    CSG *blue_diff_red_diff_green = new CSG(CSG_DIFF, blue_diff_red, green_sphere);
+//    scene.add_object(blue_diff_red_diff_green);
+
+    Sphere *yellow_sphere = new Sphere(Vertex(-0.2f, 0.25f, 1.0f), 0.5f);
+    Sphere *purple_sphere = new Sphere(Vertex(0.0f, 0.25f, 1.0f), 0.5f);
+    Sphere *light_blue_sphere = new Sphere(Vertex(0.2f, 0.25f, 1.0f), 0.5f);
+    yellow_sphere->set_material(yellow);
+    purple_sphere->set_material(purple);
+    light_blue_sphere->set_material(light_blue);
+    CSG *purple_diff_yellow = new CSG(CSG_DIFF, purple_sphere, yellow_sphere);
+    CSG *purple_diff_yellow_diff_light_blue = new CSG(CSG_DIFF, purple_diff_yellow, light_blue_sphere);
+    CSG *yellow_diff_purple_union_blue_diff_red_diff_green = new CSG(CSG_UNION, purple_diff_yellow_diff_light_blue, blue_diff_red_diff_green);
+    scene.add_object(yellow_diff_purple_union_blue_diff_red_diff_green);
 }
 
 
@@ -130,7 +146,7 @@ int main(int argc, char *argv[]) {
     build_scene(scene);
 
     // Declare a camera
-    Vertex position = *new Vertex(0.0f, 0.0f, -2.0f);
+    Vertex position = *new Vertex(0.0f, 0.0f, -1.0f);
     Vector look_at = *new Vector(0.0f, 0.0f, 1.0f);
     Vector up = *new Vector(0.0f, 1.0f, 0.0f);
     Camera *camera = new FullCamera(0.5f, position, look_at, up);

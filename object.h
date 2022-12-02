@@ -28,7 +28,6 @@
 class Object {
 public:
     Object *next;
-    Object *parent;
     Material *material;
 
     Object() {
