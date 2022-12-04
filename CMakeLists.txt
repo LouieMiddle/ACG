@@ -38,4 +38,5 @@ add_executable(
         global_material.h global_material.cpp
         quadratic_object.h quadratic_object.cpp
         csg_object.h csg_object.cpp
-        photon.h)
+        photon.h
+        point_light.h point_light.cpp)

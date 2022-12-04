@@ -112,10 +112,11 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
             viewer.normalise();
 
             bool lit;
-            lit = light->get_direction(best_hit->position, ldir);
+            float dist;
+            lit = light->get_direction(best_hit->position, ldir, dist);
 
             if (ldir.dot(best_hit->normal) > 0) {
-                lit = false;//light is facing wrong way.
+                lit = false; //light is facing wrong way.
             }
 
             // Put the shadow check here, if lit==true and in shadow, set lit=false
@@ -127,11 +128,10 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
 
                 shadow_ray.position = best_hit->position + (0.0001f * shadow_ray.direction);
 
-                if (this->shadowtrace(shadow_ray, 1000000000.0f)) {
+                if (this->shadowtrace(shadow_ray, dist)) {
                     lit = false; //there's a shadow so no lighting, if realistically close
                 }
             }
-
 
             if (lit) {
                 Colour intensity;

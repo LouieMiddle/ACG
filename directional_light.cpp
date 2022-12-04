@@ -30,9 +30,9 @@ DirectionalLight::DirectionalLight(Vector dir, Colour col) {
     intensity = col;
 }
 
-bool DirectionalLight::get_direction(Vertex &surface, Vector &dir) {
+bool DirectionalLight::get_direction(Vertex &surface, Vector &dir, float &dist) {
     dir = direction;
-
+    dist = 1000000000.0f;
     return true;
 }
 

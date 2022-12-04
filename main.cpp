@@ -20,9 +20,7 @@
  */
 
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <sstream>
 
 // these are core raytracing classes
 #include "framebuffer.h"
@@ -37,11 +35,13 @@
 
 // classes that contain our lights, all derived from Light
 #include "directional_light.h"
+#include "point_light.h"
 
 // classes that contain the materials applied to an object, all derived from Material
 #include "phong_material.h"
 #include "falsecolour_material.h"
 #include "global_material.h"
+#include "compound_material.h"
 
 //classes that contain cameras, all derived from Camera
 #include "simple_camera.h"
@@ -67,19 +67,26 @@ void build_scene(Scene &scene) {
     teapot->apply_transform(*move_teapot);
 
     Sphere *refractive_sphere = new Sphere(Vertex(0.0f, -0.2f, 1.0f), 0.3f);
-    Sphere *reflective_sphere = new Sphere(Vertex(0.0f, 2.0f, 3.0f), 0.6f);
+    Sphere *reflective_sphere = new Sphere(Vertex(0.5f, 0.0f, 0.0f), 0.3f);
+    Sphere *reflective_sphere2 = new Sphere(Vertex(-0.5f, 0.0f, 0.0f), 0.3f);
 
-    Plane *back_blue_plane = new Plane(0.0f, 0.0f, 1.0f, -20);
-    Plane *bottom_green_plane = new Plane(0.0f, 1.0f, 0.0f, 4);
+    Plane *back_white_plane = new Plane(0.0f, 0.0f, 1.0f, -2.0f);
+    Plane *top_blue_plane =new Plane(0.0f, 1.0f, 0.0f, -2.0f);
+    Plane *bottom_white_plane =new Plane(0.0f, 1.0f, 0.0f, 2.0f);
+    Plane *right_green_plane = new Plane(1.0f, 0.0f, 0.0f, -2.0f);
+    Plane *left_red_plane = new Plane(1.0f, 0.0f, 0.0f, 2.0f);
 
     Quadratic *quadratic_sphere = new Quadratic(2.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 5.0f, 0.0f, -1.0f);
     // Hyperboloid of one sheet with axis of symmetry at the x-axis
     Quadratic *quadratic_hyperboloid = new Quadratic(-3.0f, 0.0f, 0.0f, 0.0f, 6.0f, 0.0f, 0.0f, 6.0f, 0.0f, -1.0f);
 
-    DirectionalLight *dl = new DirectionalLight(Vector(1.01f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
+    DirectionalLight *dl = new DirectionalLight(Vector(1.0f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
+    PointLight *pl = new PointLight(Vertex(0.0f, 1.0f, 0.0f), Colour(10.0f, 10.0f, 10.0f, 0.0f));
 
-    scene.add_light(dl);
+//    scene.add_light(dl);
+    scene.add_light(pl);
 
+    Phong *white = new Phong(Colour(0.2f, 0.2f, 0.2f), Colour(0.4f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
     Phong *red = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
     Phong *green = new Phong(Colour(0.0f, 0.2f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
     Phong *blue = new Phong(Colour(0.0f, 0.0f, 0.2f), Colour(0.0f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
@@ -88,19 +95,34 @@ void build_scene(Scene &scene) {
     Phong *light_blue = new Phong(Colour(0.0f, 0.2f, 0.2f), Colour(0.0f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
     GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f, true);
     GlobalMaterial *reflective_glass = new GlobalMaterial(&scene, 1.52f, false);
+    CompoundMaterial *reflective_white_glass = new CompoundMaterial(2);
+    reflective_white_glass->include_material(white);
+    reflective_white_glass->include_material(reflective_glass);
+
+    Sphere *test_red_sphere = new Sphere(Vertex(0.5f, 0.0f, 0.0f), 0.3f);
+    test_red_sphere->set_material(red);
+//    scene.add_object(test_red_sphere);
 
     teapot->set_material(red);
 //    scene.add_object(teapot);
 
     refractive_sphere->set_material(refractive_glass);
-    reflective_sphere->set_material(reflective_glass);
+    reflective_sphere->set_material(reflective_white_glass);
+    reflective_sphere2->set_material(reflective_white_glass);
 //    scene.add_object(refractive_sphere);
-//    scene.add_object(reflective_sphere);
+    scene.add_object(reflective_sphere);
+    scene.add_object(reflective_sphere2);
 
-    back_blue_plane->set_material(blue);
-    bottom_green_plane->set_material(green);
-//    scene.add_object(back_blue_plane);
-//    scene.add_object(bottom_green_plane);
+    back_white_plane->set_material(white);
+    top_blue_plane->set_material(blue);
+    bottom_white_plane->set_material(white);
+    right_green_plane->set_material(green);
+    left_red_plane->set_material(red);
+    scene.add_object(back_white_plane);
+    scene.add_object(top_blue_plane);
+    scene.add_object(bottom_white_plane);
+    scene.add_object(right_green_plane);
+    scene.add_object(left_red_plane);
 
     quadratic_sphere->set_material(red);
     quadratic_hyperboloid->set_material(red);
@@ -128,7 +150,7 @@ void build_scene(Scene &scene) {
     CSG *purple_diff_yellow = new CSG(CSG_DIFF, purple_sphere, yellow_sphere);
     CSG *purple_diff_yellow_diff_light_blue = new CSG(CSG_DIFF, purple_diff_yellow, light_blue_sphere);
     CSG *yellow_diff_purple_union_blue_diff_red_diff_green = new CSG(CSG_UNION, purple_diff_yellow_diff_light_blue, blue_diff_red_diff_green);
-    scene.add_object(yellow_diff_purple_union_blue_diff_red_diff_green);
+//    scene.add_object(yellow_diff_purple_union_blue_diff_red_diff_green);
 }
 
 
