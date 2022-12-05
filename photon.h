@@ -21,15 +21,18 @@
 #include "ray.h"
 #include "colour.h"
 
+enum PhotonMode {
+    PHOTON_DIRECT = 0,
+    PHOTON_INDIRECT = 1,
+    PHOTON_SHADOW = 2
+};
+
 class Photon {
 public:
-    enum Mode {
-        PHOTON_DIRECT = 0,
-        PHOTON_INDIRECT,
-        PHOTON_SHADOW
-    };
-    
     Ray path;
     Colour intensity;
+    PhotonMode mode;
+
+    Photon(Ray p_path, Colour p_intensity, PhotonMode p_mode);
 };
 

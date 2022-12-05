@@ -154,6 +154,21 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
     }
 }
 
+// emit photons from light sources
+void Scene::emit(int number_photons, int recurse, vector<double> &points, vector<Photon> &photons, vector<long> &tags) {
+    Light *light = light_list;
+    while (light != 0) {
+        for (int i = 0; i < number_photons; i++) {
+            trace_photon(recurse, points, photons, tags, light);
+        }
+        for (Photon p: photons) {
+            // scale by number of photons from light
+            p.intensity = p.intensity * (1 / number_photons);
+        }
+        light = light->next;
+    }
+}
+
 void Scene::add_object(Object *obj) {
     obj->next = this->object_list;
     this->object_list = obj;
@@ -162,4 +177,10 @@ void Scene::add_object(Object *obj) {
 void Scene::add_light(Light *light) {
     light->next = this->light_list;
     this->light_list = light;
+}
+
+void Scene::set_photon_map() {
+    photon_map = new PhotonMap(object_list, light_list);
+    emit(50000, 50, points, photons, tags);
+    photon_map->build_kd_tree(points, tree, tags);
 }

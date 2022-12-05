@@ -43,9 +43,12 @@
 #include "global_material.h"
 #include "compound_material.h"
 
-//classes that contain cameras, all derived from Camera
+// classes that contain cameras, all derived from Camera
 #include "simple_camera.h"
 #include "full_camera.h"
+
+// classes for photon mapping
+#include "photon_map.h"
 
 using namespace std;
 
@@ -215,6 +218,9 @@ int main(int argc, char *argv[]) {
 
     // Setup the scene
     build_scene(scene);
+
+    // Generate the photon map
+    scene.set_photon_map();
 
     // Declare a camera
     Vertex position = *new Vertex(0.0f, 0.0f, -1.0f);

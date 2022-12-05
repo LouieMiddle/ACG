@@ -24,7 +24,7 @@
 
 #include "object.h"
 
-enum Mode {
+enum CSGMode {
     CSG_UNION = 0,
     CSG_INTER = 1,
     CSG_DIFF = 2
@@ -33,9 +33,9 @@ enum Mode {
 static const char *CSG_TYPE = "3CSG";
 
 class CSG : public Object {
-    Mode mode;
+    CSGMode mode;
 public:
-    CSG(Mode p_mode, Object *p_left, Object *p_right);
+    CSG(CSGMode p_mode, Object *p_left, Object *p_right);
 
     bool operation_allowed(bool lhit, bool inl, bool  inr);
 

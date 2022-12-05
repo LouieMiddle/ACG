@@ -97,7 +97,7 @@ void append(Hit **head_ref, Hit *new_data) {
     last->next = new_data;
 }
 
-CSG::CSG(Mode p_mode, Object *p_left, Object *p_right) {
+CSG::CSG(CSGMode p_mode, Object *p_left, Object *p_right) {
     mode = p_mode;
     left = p_left;
     right = p_right;
