@@ -194,25 +194,7 @@ void printlist(Hit *head) {
 Hit *CSG::intersection(Ray ray) {
     Hit *hits = left->intersection(ray);
     append(&hits, right->intersection(ray));
-
-//    cout << "Given Linked List is " << endl;
-//    printlist(hits);
-
     hits = merge_sort(hits);
-
-//    cout << "Sorted Linked List is " << endl;
-//    printlist(hits);
-
-//    Hit *tmp = hits;
-//    int count = 0;
-//    while (tmp !=  0) {
-//        tmp = tmp->next;
-//        count++;
-//    }
-//    if (count > 100) {
-//        printf("here");
-//    }
-
     return filter_hits(hits);
 }
 

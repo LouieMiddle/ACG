@@ -49,70 +49,41 @@
 
 using namespace std;
 
-// you will find it useful during development/debugging to create multiple functions that fill out the scene.
-void build_scene(Scene &scene) {
-    // The following move_teapot allows 4D homogeneous coordinates to be transformed. It moves the supplied teapot model to somewhere visible.
-    Transform *move_teapot = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
-                                           0.0f, 0.0f, 1.0f, -1.0f,
-                                           0.0f, 1.0f, 0.0f, 10.0f,
-                                           0.0f, 0.0f, 0.0f, 1.0f);
+Phong *white = new Phong(Colour(0.2f, 0.2f, 0.2f), Colour(0.4f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+Phong *red = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+Phong *green = new Phong(Colour(0.0f, 0.2f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+Phong *blue = new Phong(Colour(0.0f, 0.0f, 0.2f), Colour(0.0f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+Phong *yellow = new Phong(Colour(0.2f, 0.2f, 0.0f), Colour(0.4f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+Phong *purple = new Phong(Colour(0.2f, 0.0f, 0.2f), Colour(0.4f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+Phong *light_blue = new Phong(Colour(0.0f, 0.2f, 0.2f), Colour(0.0f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
 
-    Transform *rotate_180 = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
-                                          0.0f, -1.0f, 0.0f, 0.0f,
-                                          0.0f, 0.0f, -1.0f, 0.0f,
-                                          0.0f, 0.0f, 0.0f, 1.0f);
+Transform *rotate_90 = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
+                                     0.0f, 0.0f, 1.0f, 0.0f,
+                                     0.0f, -1.0f, 0.0f, 0.0f,
+                                     0.0f, 0.0f, 0.0f, 1.0f);
 
-    //  Read in the teapot model.
-    PolyMesh *teapot = new PolyMesh("teapot_smaller.ply", true);
-    teapot->apply_transform(*move_teapot);
+Transform *rotate_180 = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
+                                      0.0f, -1.0f, 0.0f, 0.0f,
+                                      0.0f, 0.0f, -1.0f, 0.0f,
+                                      0.0f, 0.0f, 0.0f, 1.0f);
 
-    Sphere *refractive_sphere = new Sphere(Vertex(0.0f, -0.2f, 1.0f), 0.3f);
-    Sphere *reflective_sphere = new Sphere(Vertex(0.5f, 0.0f, 0.0f), 0.3f);
-    Sphere *reflective_sphere2 = new Sphere(Vertex(-0.5f, 0.0f, 0.0f), 0.3f);
 
-    Plane *back_white_plane = new Plane(0.0f, 0.0f, 1.0f, -2.0f);
-    Plane *top_blue_plane =new Plane(0.0f, 1.0f, 0.0f, -2.0f);
-    Plane *bottom_white_plane =new Plane(0.0f, 1.0f, 0.0f, 2.0f);
-    Plane *right_green_plane = new Plane(1.0f, 0.0f, 0.0f, -2.0f);
-    Plane *left_red_plane = new Plane(1.0f, 0.0f, 0.0f, 2.0f);
-
-    Quadratic *quadratic_sphere = new Quadratic(2.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 5.0f, 0.0f, -1.0f);
-    // Hyperboloid of one sheet with axis of symmetry at the x-axis
-    Quadratic *quadratic_hyperboloid = new Quadratic(-3.0f, 0.0f, 0.0f, 0.0f, 6.0f, 0.0f, 0.0f, 6.0f, 0.0f, -1.0f);
-
+void add_lights(Scene &scene) {
     DirectionalLight *dl = new DirectionalLight(Vector(1.0f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
-    PointLight *pl = new PointLight(Vertex(0.0f, 1.0f, 0.0f), Colour(10.0f, 10.0f, 10.0f, 0.0f));
+    PointLight *top_light = new PointLight(Vertex(0.0f, 1.8f, 0.0f), Colour(10.0f, 10.0f, 10.0f, 0.0f));
+    PointLight *bottom_light = new PointLight(Vertex(0.0f, -1.8f, 0.0f), Colour(10.0f, 10.0f, 10.0f, 0.0f));
 
 //    scene.add_light(dl);
-    scene.add_light(pl);
+    scene.add_light(top_light);
+    scene.add_light(bottom_light);
+}
 
-    Phong *white = new Phong(Colour(0.2f, 0.2f, 0.2f), Colour(0.4f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-    Phong *red = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-    Phong *green = new Phong(Colour(0.0f, 0.2f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-    Phong *blue = new Phong(Colour(0.0f, 0.0f, 0.2f), Colour(0.0f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-    Phong *yellow = new Phong(Colour(0.2f, 0.2f, 0.0f), Colour(0.4f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-    Phong *purple = new Phong(Colour(0.2f, 0.0f, 0.2f), Colour(0.4f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-    Phong *light_blue = new Phong(Colour(0.0f, 0.2f, 0.2f), Colour(0.0f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-    GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f, true);
-    GlobalMaterial *reflective_glass = new GlobalMaterial(&scene, 1.52f, false);
-    CompoundMaterial *reflective_white_glass = new CompoundMaterial(2);
-    reflective_white_glass->include_material(white);
-    reflective_white_glass->include_material(reflective_glass);
-
-    Sphere *test_red_sphere = new Sphere(Vertex(0.5f, 0.0f, 0.0f), 0.3f);
-    test_red_sphere->set_material(red);
-//    scene.add_object(test_red_sphere);
-
-    teapot->set_material(red);
-//    scene.add_object(teapot);
-
-    refractive_sphere->set_material(refractive_glass);
-    reflective_sphere->set_material(reflective_white_glass);
-    reflective_sphere2->set_material(reflective_white_glass);
-//    scene.add_object(refractive_sphere);
-    scene.add_object(reflective_sphere);
-    scene.add_object(reflective_sphere2);
-
+void add_cornell_box(Scene &scene) {
+    Plane *back_white_plane = new Plane(0.0f, 0.0f, 1.0f, -2.0f);
+    Plane *top_blue_plane = new Plane(0.0f, 1.0f, 0.0f, -2.0f);
+    Plane *bottom_white_plane = new Plane(0.0f, 1.0f, 0.0f, 2.0f);
+    Plane *right_green_plane = new Plane(1.0f, 0.0f, 0.0f, -2.0f);
+    Plane *left_red_plane = new Plane(1.0f, 0.0f, 0.0f, 2.0f);
     back_white_plane->set_material(white);
     top_blue_plane->set_material(blue);
     bottom_white_plane->set_material(white);
@@ -123,36 +94,114 @@ void build_scene(Scene &scene) {
     scene.add_object(bottom_white_plane);
     scene.add_object(right_green_plane);
     scene.add_object(left_red_plane);
+}
+
+void add_reflective_refractive_spheres(Scene &scene) {
+    Sphere *refractive_sphere = new Sphere(Vertex(0.0f, -0.2f, 1.0f), 0.3f);
+    Sphere *reflective_sphere = new Sphere(Vertex(0.5f, 0.0f, 0.0f), 0.3f);
+    Sphere *reflective_sphere2 = new Sphere(Vertex(-0.5f, 0.0f, 0.0f), 0.3f);
+
+    GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f, true);
+    GlobalMaterial *reflective_glass = new GlobalMaterial(&scene, 1.52f, false);
+
+    CompoundMaterial *reflective_white_glass = new CompoundMaterial(2);
+    reflective_white_glass->include_material(white);
+    reflective_white_glass->include_material(reflective_glass);
+
+    refractive_sphere->set_material(refractive_glass);
+    reflective_sphere->set_material(reflective_white_glass);
+    reflective_sphere2->set_material(reflective_white_glass);
+
+//    scene.add_object(refractive_sphere);
+    scene.add_object(reflective_sphere);
+    scene.add_object(reflective_sphere2);
+}
+
+void add_quadratic_surfaces(Scene &scene) {
+    Quadratic *quadratic_sphere = new Quadratic(2.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 5.0f, 0.0f, -1.0f);
+    Quadratic *quadratic_hyperboloid = new Quadratic(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f);
+    Quadratic *quadratic_cone = new Quadratic(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f);
+
+    quadratic_hyperboloid->apply_transform(*rotate_90);
+    quadratic_cone->apply_transform(*rotate_90);
 
     quadratic_sphere->set_material(red);
     quadratic_hyperboloid->set_material(red);
+    quadratic_cone->set_material(red);
+
 //    scene.add_object(quadratic_sphere);
 //    scene.add_object(quadratic_hyperboloid);
+    scene.add_object(quadratic_cone);
+}
 
-    Sphere *red_sphere = new Sphere(Vertex(-0.2f, 0.0f, 1.0f), 0.5f);
-    Sphere *blue_sphere = new Sphere(Vertex(0.0f, 0.0f, 1.0f), 0.5f);
-    Sphere *green_sphere = new Sphere(Vertex(0.2f, 0.0f, 1.0f), 0.5f);
+void add_csg(Scene &scene) {
+    Sphere *red_sphere = new Sphere(Vertex(-0.2f, 0.0f, 0.0f), 0.3f);
+    Sphere *blue_sphere = new Sphere(Vertex(0.0f, 0.0f, 0.0f), 0.3f);
+    Sphere *green_sphere = new Sphere(Vertex(0.2f, 0.0f, 0.0f), 0.3f);
+
     blue_sphere->set_material(blue);
     red_sphere->set_material(red);
     green_sphere->set_material(green);
+
+//    scene.add_object(red_sphere);
+//    scene.add_object(blue_sphere);
+//    scene.add_object(green_sphere);
+
     CSG *blue_diff_red = new CSG(CSG_DIFF, blue_sphere, red_sphere);
 //    blue_diff_red->apply_transform(*rotate_180);
 //    scene.add_object(blue_diff_red);
+
     CSG *blue_diff_red_diff_green = new CSG(CSG_DIFF, blue_diff_red, green_sphere);
 //    scene.add_object(blue_diff_red_diff_green);
 
-    Sphere *yellow_sphere = new Sphere(Vertex(-0.2f, 0.25f, 1.0f), 0.5f);
-    Sphere *purple_sphere = new Sphere(Vertex(0.0f, 0.25f, 1.0f), 0.5f);
-    Sphere *light_blue_sphere = new Sphere(Vertex(0.2f, 0.25f, 1.0f), 0.5f);
+    Sphere *yellow_sphere = new Sphere(Vertex(-0.3f, 0.25f, 0.0f), 0.3f);
+    Sphere *purple_sphere = new Sphere(Vertex(0.0f, 0.25f, 0.0f), 0.3f);
+    Sphere *light_blue_sphere = new Sphere(Vertex(0.3f, 0.25f, 0.0f), 0.3f);
+
+//    scene.add_object(yellow_sphere);
+//    scene.add_object(purple_sphere);
+//    scene.add_object(light_blue_sphere);
+
     yellow_sphere->set_material(yellow);
     purple_sphere->set_material(purple);
     light_blue_sphere->set_material(light_blue);
-    CSG *purple_diff_yellow = new CSG(CSG_DIFF, purple_sphere, yellow_sphere);
-    CSG *purple_diff_yellow_diff_light_blue = new CSG(CSG_DIFF, purple_diff_yellow, light_blue_sphere);
-    CSG *yellow_diff_purple_union_blue_diff_red_diff_green = new CSG(CSG_UNION, purple_diff_yellow_diff_light_blue, blue_diff_red_diff_green);
-//    scene.add_object(yellow_diff_purple_union_blue_diff_red_diff_green);
+
+    CSG *yellow_inter_purple = new CSG(CSG_INTER, yellow_sphere, purple_sphere);
+    CSG *light_blue_inter_purple = new CSG(CSG_INTER, light_blue_sphere, purple_sphere);
+    CSG *union_above = new CSG(CSG_UNION, yellow_inter_purple, light_blue_inter_purple);
+
+//    scene.add_object(union_above);
+
+    CSG *combine_both = new CSG(CSG_UNION, union_above, blue_diff_red_diff_green);
+    scene.add_object(combine_both);
 }
 
+void build_scene(Scene &scene) {
+    // The following move_teapot allows 4D homogeneous coordinates to be transformed. It moves the supplied teapot model to somewhere visible.
+    Transform *move_teapot = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
+                                           0.0f, 0.0f, 1.0f, -1.0f,
+                                           0.0f, 1.0f, 0.0f, 10.0f,
+                                           0.0f, 0.0f, 0.0f, 1.0f);
+
+    //  Read in the teapot model.
+    PolyMesh *teapot = new PolyMesh("teapot_smaller.ply", true);
+    teapot->apply_transform(*move_teapot);
+    teapot->set_material(red);
+//    scene.add_object(teapot);
+
+
+    //  Read in the bunny model.
+//    PolyMesh *bunny = new PolyMesh("bunny.ply", true);
+//    teapot->apply_transform();
+//    bunny->set_material(red);
+//    scene.add_object(bunny);
+
+    add_lights(scene);
+    add_cornell_box(scene);
+//    add_reflective_refractive_spheres(scene);
+//    add_quadratic_surfaces(scene);
+    add_csg(scene);
+}
 
 // This is the entry point function to the program.
 int main(int argc, char *argv[]) {
