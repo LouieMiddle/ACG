@@ -18,29 +18,41 @@
 
 #include "full_camera.h"
 
-FullCamera::FullCamera(float f, Vertex &p_position, Vector &p_look_at, Vector &p_up) {
+FullCamera::FullCamera() {
+    fov = 0.5;
+    position = Vertex(0.0f, 0.0f, 0.0f, 1.0f);
+    lookat = Vector(0.0f, 0.0f, 1.0f);
+    up = Vector(0.0f, 1.0f, 0.0f);
+    right = Vector(1.0f, 0.0f, 0.0f);
+}
+
+FullCamera::FullCamera(float f, Vertex &p_position, Vector &p_lookat, Vector &p_up) {
     fov = f;
     position = p_position;
-    look_at = p_look_at;
-
-    w = position - look_at;
-    w.normalise();
-
-    p_up.cross(w, up);
+    lookat = p_lookat;
+    up = p_up;
+    up.cross(lookat, right);
+    lookat.cross(right, up);
     up.normalise();
+    right.normalise();
+    lookat.normalise();
+}
 
-    w.cross(up, right);
+void FullCamera::get_ray_offset(int p_x, int p_y, float p_ox, float p_oy, Ray &p_ray) {
+    float fx = (p_ox + (float) p_x + 0.5f) / (float) width;
+    float fy = (p_oy + (float) p_y + 0.5f) / (float) height;
+
+    p_ray.position = position;
+    p_ray.direction = ((fx - 0.5f) * right) + ((0.5f - fy) * up) + (fov * lookat);
+    p_ray.direction.normalise();
 }
 
 void FullCamera::get_ray_pixel(int p_x, int p_y, Ray &ray) {
-    ray.position = position;
-
     float fx = ((float) p_x + 0.5f) / (float) width;
     float fy = ((float) p_y + 0.5f) / (float) height;
-    float xv = (fx - 0.5f);
-    float yv = (0.5f - fy);
 
-    ray.direction = xv * up + yv * right - fov * w;
+    ray.position = position;
+    ray.direction = ((fx - 0.5f) * right) + ((0.5f - fy) * up) + (fov * lookat);
     ray.direction.normalise();
 }
 
@@ -48,14 +60,13 @@ void FullCamera::render(Environment &env, FrameBuffer &fb) {
     width = fb.width;
     height = fb.height;
 
-    // y = row, x = column
     for (int y = 0; y < height; y += 1) {
         for (int x = 0; x < width; x += 1) {
             Ray ray;
 
             get_ray_pixel(x, y, ray);
 
-            Colour colour = Colour(0.0f, 0.0f, 0.0f, 0.0f);
+            Colour colour = Colour(0.0f, 0.0f, 0.0f);
             float depth = 0.0f;
 
             env.raytrace(ray, 5, colour, depth);

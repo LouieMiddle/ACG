@@ -19,14 +19,12 @@
 #include "sphere_object.h"
 #include <math.h>
 
-
 Sphere::Sphere(Vertex c, float r) {
     center = c;
     radius = r;
 }
 
 Hit *Sphere::intersection(Ray ray) {
-
     Vector ro;
 
     // offset ray by sphere position

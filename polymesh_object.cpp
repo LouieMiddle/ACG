@@ -17,172 +17,333 @@
 */
 
 #include <stdlib.h>
+#include <math.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <vector>
 
 #include "polymesh_object.h"
-#include "hit.h"
-#include "transform.h"
-#include "ray.h"
 
 using namespace std;
 
-template<typename Out>
-void split(const string &s, char delim, Out result) {
-    std::istringstream iss(s);
-    std::string item;
-    while (std::getline(iss, item, delim)) {
-        *result++ = item;
-    }
-}
-
-vector<string> split(const string &s, char delim) {
-    vector<string> elems;
-    split(s, delim, back_inserter(elems));
-    return elems;
-}
-
 PolyMesh::PolyMesh(char *file, bool smooth) {
-    ifstream infile;
-    infile.open(file);
+    int count;
 
-    if (!infile.is_open()) {
-        perror("Error opening polymesh file");
-        exit(EXIT_FAILURE);
+    ifstream meshfile(file);
+
+    smoothing = smooth;
+
+    cerr << "Opening meshfile: " << file << endl;
+
+    if (!meshfile.is_open()) {
+        cerr << "Problem reading meshfile (not found)." << endl;
+        meshfile.close();
+        exit(-1);
     }
-
-    string first_line;
-    getline(infile, first_line);
-    if (first_line == "kcply") {
-        cout << "ken cameron ply reading..." << endl;
-    } else {
-        cout << "not ken cameron ply, ignoring file" << endl;
-        exit(EXIT_FAILURE);
-    }
-
-    string second_line;
-    getline(infile, second_line);
-    if ((second_line.rfind("element", 0) == 0) && (second_line.rfind("vertex", 8) == 8)) {
-        vertex_count = stoi(second_line.substr(15));
-    } else {
-        cout << "can't find vertexes, ignoring file" << endl;
-        exit(EXIT_FAILURE);
-    }
-
-    string third_line;
-    getline(infile, third_line);
-    if ((second_line.rfind("element", 0) == 0) && (third_line.rfind("face", 8) == 8)) {
-        triangle_count = stoi(third_line.substr(13));
-    } else {
-        cout << "can't find triangles, ignoring file" << endl;
-        exit(EXIT_FAILURE);
-    }
-
-    vertex = new Vertex[vertex_count];
-    triangle = new TriangleIndex[triangle_count];
 
     string line;
 
-    for (int v = 0; v < vertex_count; v++) {
-        getline(infile, line);
-        vector<string> words = split(line, ' ');
-
-        vertex[v] = *new Vertex(stof(words[0]), stof(words[1]), stof(words[2]));
+    try {
+        getline(meshfile, line);
+    }
+    catch (ifstream::failure e) {
+        cerr << "Problem reading meshfile (getline failed)." << endl;
     }
 
-    for (int t = 0; t < triangle_count; t++) {
-        getline(infile, line);
-        vector<string> words = split(line, ' ');
+    if (line.compare("kcply") != 0) {
+        cerr << "Problem reading meshfile (not kcply). [" << line << "]" << endl;
+        meshfile.close();
+        exit(-1);
+    }
 
-        triangle[t][0] = stoi(words[1]);
-        triangle[t][1] = stoi(words[2]);
-        triangle[t][2] = stoi(words[3]);
+    try {
+        getline(meshfile, line);
+    }
+    catch (ifstream::failure e) {
+        cerr << "Problem reading meshfile (getline failed)." << endl;
+        exit(-1);
+    }
+
+    istringstream vertex_iss(line);
+    string vertex_element;
+    string vertex_label;
+
+    vertex_iss >> vertex_element >> vertex_label >> vertex_count;
+
+    if ((vertex_element.compare("element") != 0) || (vertex_label.compare("vertex") != 0)) {
+        cerr << "Problem reading meshfile (element vertex)." << endl;
+        meshfile.close();
+        exit(-1);
+    }
+
+    cerr << "Expect " << vertex_count << " vertices." << endl;
+
+    try {
+        getline(meshfile, line);
+    }
+    catch (ifstream::failure e) {
+        cerr << "Problem reading meshfile (getline failed)." << endl;
+        exit(-1);
+    }
+
+    istringstream triangle_iss(line);
+    string triangle_element;
+    string triangle_label;
+
+    triangle_iss >> triangle_element >> triangle_label >> triangle_count;
+
+    if ((triangle_element.compare("element") != 0) || (triangle_label.compare("face") != 0)) {
+        cerr << "Problem reading meshfile (element triangle)." << endl;
+        meshfile.close();
+        exit(-1);
+    }
+
+    cerr << "Expect " << triangle_count << " triangles." << endl;
+
+    vertex = new Vertex[vertex_count];
+
+    triangle = new TriangleIndex[triangle_count];
+
+    face_normal = new Vector[triangle_count];
+
+    for (int i = 0; i < vertex_count; i += 1) {
+        try {
+            getline(meshfile, line);
+        }
+        catch (ifstream::failure e) {
+            cerr << "Problem reading meshfile (getline failed)." << endl;
+            exit(-1);
+        }
+
+        vertex_iss.clear();
+        vertex_iss.str(line);
+
+        vertex_iss >> vertex[i].x >> vertex[i].y >> vertex[i].z;
+
+        vertex[i].w = 1.0f;
+    }
+
+    for (int i = 0; i < triangle_count; i += 1) {
+        try {
+            getline(meshfile, line);
+        }
+        catch (ifstream::failure e) {
+            cerr << "Problem reading meshfile (getline failed)." << endl;
+            exit(-1);
+        }
+
+        triangle_iss.clear();
+        triangle_iss.str(line);
+
+        triangle_iss >> count >> triangle[i][0] >> triangle[i][1] >> triangle[i][2];
+
+        if (count != 3) {
+            cerr << "Problem reading meshfile (non-triangle present)." << endl;
+            exit(-1);
+        }
+
+        compute_face_normal(i, face_normal[i]);
+    }
+
+    if (smooth) {
+        vertex_normal = new Vector[vertex_count];
+        compute_vertex_normals();
+    } else {
+        vertex_normal = 0;
+    }
+
+    meshfile.close();
+    cerr << "Meshfile read." << endl;
+
+    next = 0;
+}
+
+
+// Moller-Trumbore
+bool PolyMesh::rayTriangleIntersect(const Ray &ray, Vector v0, Vector v1, Vector v2, float &t, float &u, float &v) {
+    Vector p;
+    Vector d;
+    Vector e1, e2, h, s, q;
+    float a, f;
+
+    p.x = ray.position.x;
+    p.y = ray.position.y;
+    p.z = ray.position.z;
+    d = ray.direction;
+
+    e1 = v1 - v0;
+    e2 = v2 - v0;
+
+    d.cross(e2, h);
+    a = e1.dot(h);
+
+    if (a > -0.00001f && a < 0.00001f) {
+        return false;
+    }
+
+    f = 1 / a;
+    s = p - v0;
+    u = f * s.dot(h);
+
+    if (u < 0.0f || u > 1.0f) {
+        return false;
+    }
+
+    s.cross(e1, q);
+    v = f * d.dot(q);
+
+    if ((v < 0.0f) || ((u + v) > 1.0f)) {
+        return false;
+    }
+
+    // compute t
+
+    t = f * e2.dot(q);
+
+    return true;
+}
+
+void PolyMesh::compute_vertex_normals(void) {
+    // The vertex_normal array is already zeroed.
+
+    for (int i = 0; i < triangle_count; i += 1) {
+        for (int j = 0; j < 3; j += 1) {
+            vertex_normal[triangle[i][j]] = vertex_normal[triangle[i][j]] + face_normal[i];
+        }
+    }
+
+    for (int i = 0; i < vertex_count; i += 1) {
+        vertex_normal[i].normalise();
     }
 }
 
-Hit *PolyMesh::triangle_intersection(Ray ray, int triangle_index, float &u, float &v) {
-    Vertex point0 = vertex[triangle[triangle_index][0]];
-    Vertex point1 = vertex[triangle[triangle_index][1]];
-    Vertex point2 = vertex[triangle[triangle_index][2]];
+void PolyMesh::compute_face_normal(int which_triangle, Vector &normal) {
+    Vector v0v1, v0v2;
+    v0v1.x = vertex[triangle[which_triangle][1]].x - vertex[triangle[which_triangle][0]].x;
+    v0v1.y = vertex[triangle[which_triangle][1]].y - vertex[triangle[which_triangle][0]].y;
+    v0v1.z = vertex[triangle[which_triangle][1]].z - vertex[triangle[which_triangle][0]].z;
 
-    Vector point0point1 = point1 - point0;
-    Vector point0point2 = point2 - point0;
+    v0v1.normalise();
 
-    Vector normal;
-    point0point1.cross(point0point2, normal);
-    float denom = normal.dot(normal);
+    v0v2.x = vertex[triangle[which_triangle][2]].x - vertex[triangle[which_triangle][0]].x;
+    v0v2.y = vertex[triangle[which_triangle][2]].y - vertex[triangle[which_triangle][0]].y;
+    v0v2.z = vertex[triangle[which_triangle][2]].z - vertex[triangle[which_triangle][0]].z;
 
-    float const EPSILON = 0.0000001;
-    float normal_dot_ray_direction = normal.dot(ray.direction);
-    // check if ray and plane are parallel
-    if (fabs(normal_dot_ray_direction) < EPSILON) return 0;
+    v0v2.normalise();
 
-    float d = -normal.dot(point0);
+    v0v1.cross(v0v2, normal);
+    normal.normalise();
+}
 
-    float t = -(normal.dot(ray.position) + d) / normal_dot_ray_direction;
-    // check if the triangle is in behind the ray
-    if (t < 0) return 0;
+Hit *PolyMesh::triangle_intersection(Ray ray, int which_triangle) {
+    float ndotdir = face_normal[which_triangle].dot(ray.direction);
 
-    // compute the intersection point
-    Vector P = ray.position + t * ray.direction;
-    Vector C;
+    if (fabs(ndotdir) < 0.000000001f) {
+        // ray is parallel to triangle so does not intersect
+        return 0;
+    }
 
-    // Check if P is inside triangle boundaries
-    Vector edge0 = point1 - point0;
-    Vector p0 = P - point0;
-    edge0.cross(p0, C);
-    if (normal.dot(C) < 0) return 0;
+    float t, u, v;
 
-    // Check if P is inside triangle boundaries
-    Vector edge1 = point2 - point1;
-    Vector p1 = P - point1;
-    edge1.cross(p1, C);
-    if ((u = normal.dot(C)) < 0) return 0;
+    bool flag = rayTriangleIntersect(ray, vertex[triangle[which_triangle][0]], vertex[triangle[which_triangle][1]],
+                                     vertex[triangle[which_triangle][2]], t, u, v);
 
-    // Check if P is inside triangle boundaries
-    Vector edge2 = point0 - point2;
-    Vector p2 = P - point2;
-    edge2.cross(p2, C);
-    if ((v = normal.dot(C)) < 0) return 0;
+    if (flag == false) return 0;
 
     Hit *hit = new Hit();
-    hit->what = this;
-    hit->t = t;
-    hit->entering = true;
 
+    hit->t = t;
+    hit->what = this;
     hit->position = ray.position + t * ray.direction;
-    normal.negate();
-    normal.normalise();
-    hit->normal = normal;
+
+    if (smoothing) {
+        hit->normal = u * vertex_normal[triangle[which_triangle][1]]
+                      + v * vertex_normal[triangle[which_triangle][2]]
+                      + (1 - u - v) * vertex_normal[triangle[which_triangle][0]];
+    } else {
+        hit->normal = face_normal[which_triangle];
+    }
+
+    hit->normal.normalise();
+
+    if (hit->normal.dot(ray.direction) > 0.0) {
+        hit->normal.negate();
+    }
 
     return hit;
 }
 
+
 Hit *PolyMesh::intersection(Ray ray) {
     Hit *hits = 0;
 
-    for (int i = 0; i < triangle_count; i++) {
-        float u, v;
-        Hit *intersect = triangle_intersection(ray, i, u, v);
+    int i;
 
-        if (intersect != 0) {
-            if (hits == 0) {
-                hits = intersect;
-            } else if (hits->t > intersect->t) {
-                intersect->next = hits;
-                hits = intersect;
+    // Check each triangle, add any hits to sorted list.
+
+    for (i = 0; i < triangle_count; i += 1) {
+        Hit *hit = triangle_intersection(ray, i);
+
+        if (hit != 0) {
+            if (hits != 0) {
+                Hit *step = hits;
+                Hit *prev = 0;
+                while (step != 0) {
+                    if (hit->t < step->t) {
+                        // if the new hit is in front of the current step, it inserts before it.
+                        hit->next = step;
+                        if (prev != 0) {
+                            prev->next = hit;
+                        } else {
+                            hits = hit;
+                        }
+                        break;
+                    }
+
+                    prev = step;
+                    step = step->next;
+                }
+
+                if (step == 0) {
+                    // hit if bigger than step, insert it afterwards
+                    prev->next = hit;
+                    hit->next = 0;
+                }
+            } else {
+                hit->next = 0;
+                hits = hit;
             }
         }
+    }
+
+    Hit *temp = hits;
+    bool entering = true;
+
+    while (temp != 0) {
+        temp->entering = entering;
+        entering = !entering;
+        temp = temp->next;
     }
 
     return hits;
 }
 
 void PolyMesh::apply_transform(Transform &trans) {
-    for (int v = 0; v < vertex_count; v++) {
-        trans.apply(vertex[v]);
+    for (int i = 0; i < vertex_count; i += 1) {
+        trans.apply(vertex[i]);
+    }
+
+    Transform ti = trans.inverse().transpose();
+
+    if (smoothing) {
+
+        for (int i = 0; i < vertex_count; i += 1) {
+            ti.apply(vertex_normal[i]);
+        }
+    }
+
+    for (int i = 0; i < triangle_count; i += 1) {
+        ti.apply(face_normal[i]);
     }
 }

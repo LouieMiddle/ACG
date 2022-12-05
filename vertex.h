@@ -47,7 +47,6 @@ public:
         w = 1.0f;
     }
 
-
     Vertex operator+(Vector const &b) {
         Vertex r;
         r.x = this->x + b.x;

@@ -25,13 +25,14 @@
 class GlobalMaterial : public Material {
 public:
     float ior;
+    bool transmissive;
     Environment *environment;
 
-    GlobalMaterial(Environment *p_env, float ior);
+    GlobalMaterial(Environment *p_env, float ior, bool transmissive);
 
-    void fresnel(Vector &view, Vector &normal, float &kr);
+    void fresnel(Vector &view, Vector &normal, float &kr, float cosi);
 
-    void refract_ray(Vector &view, Vector &normal, Vector &refract_ray);
+    void refract_ray(Vector &view, Vector &normal, Vector &refract_ray, float cosi);
 
     Colour compute_once(Ray &viewer, Hit &hit, int recurse);
 

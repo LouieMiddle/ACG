@@ -112,27 +112,34 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
             viewer.normalise();
 
             bool lit;
-            lit = light->get_direction(best_hit->position, ldir);
+            float dist;
+            lit = light->get_direction(best_hit->position, ldir, dist);
 
-            //light is facing wrong way.
             if (ldir.dot(best_hit->normal) > 0) {
-                lit = false;
+                lit = false; //light is facing wrong way.
             }
 
-            Vector shadow_ray_direction = -ldir;
-            Vertex shadow_ray_position = best_hit->position + 0.001f * shadow_ray_direction;
-            Ray shadow_ray = Ray(shadow_ray_position, shadow_ray_direction);
-            bool shadow = shadowtrace(shadow_ray, 10.0f);
-            if (lit && shadow) {
-                lit = false;
+            // Put the shadow check here, if lit==true and in shadow, set lit=false
+
+            if (lit) {
+                Ray shadow_ray;
+
+                shadow_ray.direction = -ldir;
+
+                shadow_ray.position = best_hit->position + (0.0001f * shadow_ray.direction);
+
+                if (this->shadowtrace(shadow_ray, dist)) {
+                    lit = false; //there's a shadow so no lighting, if realistically close
+                }
             }
 
             if (lit) {
                 Colour intensity;
+
                 light->get_intensity(best_hit->position, intensity);
+
                 colour = colour + intensity * best_hit->what->material->compute_per_light(viewer, *best_hit,
                                                                                           ldir); // this is the per light local contrib e.g. diffuse, specular
-
             }
 
             light = light->next;

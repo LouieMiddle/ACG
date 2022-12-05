@@ -27,7 +27,6 @@
 
 class Object {
 public:
-
     Object *next;
     Material *material;
 

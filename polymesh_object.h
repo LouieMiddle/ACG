@@ -29,9 +29,18 @@ public:
     int vertex_count;
     int triangle_count;
     Vertex *vertex;
+    Vector *face_normal;
+    Vector *vertex_normal;
     TriangleIndex *triangle;
+    bool smoothing;
 
-    Hit *triangle_intersection(Ray ray, int triangle_index, float &u, float &v);
+    Hit *triangle_intersection(Ray ray, int which_triangle);
+
+    void compute_face_normal(int which_triangle, Vector &normal);
+
+    void compute_vertex_normals();
+
+    bool rayTriangleIntersect(const Ray &ray, Vector v0, Vector v1, Vector v2, float &t, float &u, float &v);
 
     Hit *intersection(Ray ray);
 

@@ -24,7 +24,6 @@
 
 class Transform {
 public:
-
     float matrix[4][4];
 
     Transform() {

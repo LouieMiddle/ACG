@@ -26,7 +26,6 @@
 
 class Material {
 public:
-
     // compute_once is called once per intersection
     virtual Colour compute_once(Ray &viewer, Hit &hit, int recurse) {
         Colour result;
