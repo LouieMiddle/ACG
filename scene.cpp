@@ -159,7 +159,7 @@ void Scene::emit(int number_photons, int recurse, vector<double> &points, vector
     Light *light = light_list;
     while (light != 0) {
         for (int i = 0; i < number_photons; i++) {
-            trace_photon(recurse, points, photons, tags, light);
+//            trace_photon(recurse, points, photons, tags, light);
         }
         for (Photon p: photons) {
             // scale by number of photons from light
@@ -179,8 +179,8 @@ void Scene::add_light(Light *light) {
     this->light_list = light;
 }
 
-void Scene::set_photon_map() {
-    photon_map = new PhotonMap(object_list, light_list);
-    emit(50000, 50, points, photons, tags);
-    photon_map->build_kd_tree(points, tree, tags);
-}
+//void Scene::set_photon_map() {
+//    photon_map = new PhotonMap(object_list, light_list);
+//    emit(50000, 50, points, photons, tags);
+//    photon_map->build_kd_tree(points, tree, tags);
+//}

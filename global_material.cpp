@@ -27,42 +27,42 @@ GlobalMaterial::GlobalMaterial(Environment *p_env, float p_ior, bool p_transmiss
 }
 
 // TODO: Cite scratch a pixel
-void GlobalMaterial::fresnel(Vector &view, Vector &normal, float &kr, float cosi) {
-    float etai = 1.0f, etat = ior;
+void GlobalMaterial::fresnel(float &kr, float cos_i) {
+    float eta_i = 1.0f, eta_t = ior;
     // The ray starts in the medium that is not air so swap the refractive indexes
-    if (cosi > 0.0f) {
-        std::swap(etai, etat);
+    if (cos_i > 0.0f) {
+        swap(eta_i, eta_t);
     }
-    // Compute sint using Snell's law
-    float sint = (etai / etat) * sqrtf(std::max(0.0f, 1.0f - cosi * cosi));
+    // Compute sin_t using Snell's law
+    float sin_t = (eta_i / eta_t) * sqrtf(max(0.0f, 1.0f - cos_i * cos_i));
     // Total internal reflection
-    if (sint >= 1) {
+    if (sin_t >= 1) {
         kr = 1;
     } else {
-        float cost = sqrtf(std::max(0.0f, 1.0f - sint * sint));
-        cosi = fabsf(cosi);
-        float rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
-        float rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+        float cost = sqrtf(max(0.0f, 1.0f - sin_t * sin_t));
+        cos_i = fabsf(cos_i);
+        float rs = ((eta_t * cos_i) - (eta_i * cost)) / ((eta_t * cos_i) + (eta_i * cost));
+        float rp = ((eta_i * cos_i) - (eta_t * cost)) / ((eta_i * cos_i) + (eta_t * cost));
         kr = (rs * rs + rp * rp) / 2.0f;
     }
 }
 
 // TODO: Cite scratch a pixel
-void GlobalMaterial::refract_ray(Vector &view, Vector &normal, Vector &refract_ray, float cosi) {
-    float etai = 1.0f, etat = ior;
+void GlobalMaterial::refract_ray(Vector &view, Vector &normal, Vector &refract_ray, float cos_i) {
+    float eta_i = 1.0f, eta_t = ior;
     Vector n = normal;
-    if (cosi < 0.0f) {
-        cosi = -cosi;
+    if (cos_i < 0.0f) {
+        cos_i = -cos_i;
     } else {
         // The ray starts in the medium that is not air so swap the refractive indexes and negate normal
-        std::swap(etai, etat);
+        swap(eta_i, eta_t);
         n = -normal;
     }
 
-    float eta = etai / etat;
-    float k = 1.0f - (eta * eta) * (1.0f - cosi * cosi);
-    float cost = sqrt(k);
-    refract_ray = eta * view + (eta * cosi - cost) * n;
+    float eta = eta_i / eta_t;
+    float cos_t = sqrt(1.0f - (eta * eta) * (1.0f - cos_i * cos_i));
+    refract_ray = eta * view + (eta * cos_i - cos_t) * n;
+//    cout << "1 " << refract_ray.x << " " << refract_ray.y << " " << refract_ray.z << "\n";
 }
 
 // reflection and recursion computation
@@ -70,31 +70,35 @@ Colour GlobalMaterial::compute_once(Ray &viewer, Hit &hit, int recurse) {
     Colour result = Colour(0.0f, 0.0f, 0.0f);
 
     if (recurse > 0) {
-        float cosi = clamp(-1.0f, 1.0f, viewer.direction.dot(hit.normal));
-        bool outside = cosi < 0;
+        float cos_i = viewer.direction.dot(hit.normal);
+        bool outside = cos_i < 0;
 
         float kr;
-        fresnel(viewer.direction, hit.normal, kr, cosi);
+        fresnel(kr, cos_i);
 
         Vector bias = 0.0001f * hit.normal;
 
-        Colour refract_colour = Colour(0.0f, 0.0f, 0.0f);
         if (transmissive && kr < 1.0f) {
             Ray refraction_ray;
-            refract_ray(viewer.direction, hit.normal, refraction_ray.direction, cosi);
+            float refraction_depth;
+            Colour refract_colour = Colour(0.0f, 0.0f, 0.0f);
+            refract_ray(viewer.direction, hit.normal, refraction_ray.direction, cos_i);
+//            cout << "2 " << refraction_ray.direction.x << " " << refraction_ray.direction.y << " " << refraction_ray.direction.z << "\n";
             refraction_ray.direction.normalise();
             refraction_ray.position = outside ? hit.position - bias : hit.position + bias;
-            environment->raytrace(refraction_ray, recurse - 1, refract_colour, hit.t);
+            environment->raytrace(refraction_ray, recurse - 1, refract_colour, refraction_depth);
+            result += refract_colour * (1 - kr);
         }
 
         Ray reflected_ray;
+        float reflected_depth;
         Colour reflect_colour = Colour(0.0f, 0.0f, 0.0f);
-        reflected_ray.direction = viewer.direction - 2.0f * hit.normal.dot(viewer.direction) * hit.normal;
+        reflected_ray.direction = viewer.direction - 2.0f * cos_i * hit.normal;
         reflected_ray.direction.normalise();
         reflected_ray.position = outside ? hit.position + bias : hit.position - bias;
-        environment->raytrace(reflected_ray, recurse - 1, reflect_colour, hit.t);
+        environment->raytrace(reflected_ray, recurse - 1, reflect_colour, reflected_depth);
 
-        result = transmissive ? result + reflect_colour * kr + refract_colour * (1 - kr) : result + reflect_colour * 0.8;
+        result = transmissive ? result + reflect_colour * kr : result + reflect_colour * 0.8;
     }
 
     return result;
@@ -108,14 +112,4 @@ Colour GlobalMaterial::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir)
     result.b = 0.0f;
 
     return result;
-}
-
-float GlobalMaterial::clamp(float lower, float upper, float number) {
-    if (number < lower) {
-        return lower;
-    }
-    if (number > upper) {
-        return upper;
-    }
-    return number;
 }

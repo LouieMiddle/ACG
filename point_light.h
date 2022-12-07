@@ -4,6 +4,8 @@
 
 // light where each ray is spawned at a different location within given limits
 
+using namespace std;
+
 class PointLight : public Light {
 public:
     Vertex position;

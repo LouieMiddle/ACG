@@ -48,7 +48,7 @@
 #include "full_camera.h"
 
 // classes for photon mapping
-#include "photon_map.h"
+//#include "photon_map.h"
 
 using namespace std;
 
@@ -73,12 +73,12 @@ Transform *rotate_180 = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
 
 void add_lights(Scene &scene) {
     DirectionalLight *dl = new DirectionalLight(Vector(1.0f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
-    PointLight *top_light = new PointLight(Vertex(0.0f, 1.8f, 0.0f), Colour(10.0f, 10.0f, 10.0f, 0.0f));
-    PointLight *bottom_light = new PointLight(Vertex(0.0f, -1.8f, 0.0f), Colour(10.0f, 10.0f, 10.0f, 0.0f));
+    PointLight *top_light = new PointLight(Vertex(-1.8f, 1.8f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
+    PointLight *bottom_light = new PointLight(Vertex(0.0f, -1.8f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
 
 //    scene.add_light(dl);
     scene.add_light(top_light);
-    scene.add_light(bottom_light);
+//    scene.add_light(bottom_light);
 }
 
 void add_cornell_box(Scene &scene) {
@@ -99,8 +99,9 @@ void add_cornell_box(Scene &scene) {
     scene.add_object(left_red_plane);
 }
 
-void add_reflective_refractive_spheres(Scene &scene) {
-    Sphere *refractive_sphere = new Sphere(Vertex(0.0f, -0.2f, 1.0f), 0.3f);
+void add_reflective_refractive(Scene &scene) {
+    Sphere *yellow_sphere = new Sphere(Vertex(0.2f, 0.6f, 1.0f), 0.5f);
+    Sphere *refractive_sphere = new Sphere(Vertex(0.0f, 0.0f, 0.0f), 0.3f);
     Sphere *reflective_sphere = new Sphere(Vertex(0.5f, 0.0f, 0.0f), 0.3f);
     Sphere *reflective_sphere2 = new Sphere(Vertex(-0.5f, 0.0f, 0.0f), 0.3f);
 
@@ -111,13 +112,15 @@ void add_reflective_refractive_spheres(Scene &scene) {
     reflective_white_glass->include_material(white);
     reflective_white_glass->include_material(reflective_glass);
 
+    yellow_sphere->set_material(yellow);
     refractive_sphere->set_material(refractive_glass);
     reflective_sphere->set_material(reflective_white_glass);
     reflective_sphere2->set_material(reflective_white_glass);
 
-//    scene.add_object(refractive_sphere);
-    scene.add_object(reflective_sphere);
-    scene.add_object(reflective_sphere2);
+    scene.add_object(yellow_sphere);
+    scene.add_object(refractive_sphere);
+//    scene.add_object(reflective_sphere);
+//    scene.add_object(reflective_sphere2);
 }
 
 void add_quadratic_surfaces(Scene &scene) {
@@ -201,9 +204,9 @@ void build_scene(Scene &scene) {
 
     add_lights(scene);
     add_cornell_box(scene);
-//    add_reflective_refractive_spheres(scene);
+    add_reflective_refractive(scene);
 //    add_quadratic_surfaces(scene);
-    add_csg(scene);
+//    add_csg(scene);
 }
 
 // This is the entry point function to the program.
@@ -220,7 +223,7 @@ int main(int argc, char *argv[]) {
     build_scene(scene);
 
     // Generate the photon map
-    scene.set_photon_map();
+//    scene.set_photon_map();
 
     // Declare a camera
     Vertex position = *new Vertex(0.0f, 0.0f, -1.0f);

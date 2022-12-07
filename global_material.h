@@ -22,6 +22,8 @@
 #include "material.h"
 #include "environment.h"
 
+using namespace std;
+
 class GlobalMaterial : public Material {
 public:
     float ior;
@@ -30,14 +32,12 @@ public:
 
     GlobalMaterial(Environment *p_env, float ior, bool transmissive);
 
-    void fresnel(Vector &view, Vector &normal, float &kr, float cosi);
+    void fresnel(float &kr, float cos_i);
 
-    void refract_ray(Vector &view, Vector &normal, Vector &refract_ray, float cosi);
+    void refract_ray(Vector &view, Vector &normal, Vector &refract_ray, float cos_i);
 
     Colour compute_once(Ray &viewer, Hit &hit, int recurse);
 
     Colour compute_per_light(Vector &viewer, Hit &hit, Vector &ldir);
-
-    float clamp(float lower, float upper, float number);
 };
 

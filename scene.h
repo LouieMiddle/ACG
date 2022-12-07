@@ -38,7 +38,7 @@ class Scene : public Environment {
 public:
     Object *object_list;
     Light *light_list;
-    PhotonMap *photon_map;
+//    PhotonMap *photon_map;
     vector<Photon> photons;
     vector<double> points;
     vector<long> tags;
