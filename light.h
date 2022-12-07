@@ -26,6 +26,10 @@
 
 class Light {
 public:
+    Vertex position;
+    Vector direction;
+    Colour intensity;
+
     Light *next;
 
     Light() {

@@ -98,9 +98,15 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
 
     // if we found a primitive then compute the colour we should see
     if (best_hit != 0) {
+        int neighbours = 700;
+        vector<Photon *> local_photons = photon_map->gather_photons(best_hit->position, neighbours, tree, photons);
+
         depth = best_hit->t;
+
         colour = colour + best_hit->what->material->compute_once(ray, *best_hit,
                                                                  recurse); // this will be the global components such as ambient or reflect/refract
+
+        colour = colour + photon_map->estimate_radiance(*best_hit, local_photons);
 
         // next, compute the light contribution for each light in the scene.
         Light *light = light_list;
@@ -154,12 +160,94 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
     }
 }
 
+// TODO: Add to utils
+// generate random float between two values
+float get_random_number(float min, float max) {
+    random_device device;
+    mt19937 random(device());
+    uniform_real_distribution<> distribution(min, max);
+    auto n = distribution(random);
+    return n;
+}
+
+// TODO: Add to utils class
+Vector get_random_direction() {
+    float x = get_random_number(-1.0f, 1.0f);
+    float y = get_random_number(-1.0f, 1.0f);
+    float z = get_random_number(-1.0f, 1.0f);
+
+    Vector direction = Vector(x, y, z);
+    direction.normalise();
+
+    return direction;
+}
+
+// generate random direction in direction within cone (defined by size of theta)
+Vector random_direction(Vector direction, float theta) {
+    // make basis vectors based on direction
+    Vector basis_z = direction;
+    basis_z.normalise();
+
+    Vector basis_x;
+    Vector different = (0.5 > fabs(basis_z.x)) ? Vector(1, 0, 0) : Vector(0, 1, 0);
+    basis_z.cross(different, basis_x);
+    basis_x.normalise();
+
+    Vector basis_y;
+    basis_x.cross(basis_z, basis_y);
+
+    // height
+    float z = get_random_number(cos(theta), 1);
+
+    // rotation
+    float phi = get_random_number(-M_PI, +M_PI);
+    float x = sqrt(1 - z * z) * cos(phi);
+    float y = sqrt(1 - z * z) * sin(phi);
+
+    // combine
+    Vector result = x * basis_x + y * basis_y + z * basis_z;
+    result.normalise();
+    return result;
+}
+
+void Scene::trace_photon(Photon photon, int recurse, vector<double> &points, vector<Photon> &photons, vector<long long> &tags) {
+    if (recurse < 1) return;
+
+    Hit *best_hit = trace(photon.path);
+    if (best_hit != 0) {
+        photon.path.position = best_hit->position;
+
+        Material *m = best_hit->what->material;
+        photon_map->store_photon(photon, points, photons, tags);
+
+        // Russian Roulette
+        float probability = get_random_number(0, 1);
+        if (probability <= m->kd) {
+            // DIFFUSE REFLECTION
+            photon.path.direction = random_direction(best_hit->normal, M_PI);
+            photon.intensity = m->compute_ambient() * (1 / m->kd);
+            trace_photon(photon, recurse - 1, points, photons, tags);
+        } else if (probability <= m->kd + m->ks) {
+            // SPECULAR REFLECTION
+            best_hit->normal.reflection(photon.path.direction, photon.path.direction);
+            photon.intensity = m->compute_ambient() * (1 / m->ks);
+            trace_photon(photon, recurse - 1, points, photons, tags);
+        } else {
+            // PHOTON ABSORBED
+            return;
+        }
+    }
+}
+
 // emit photons from light sources
-void Scene::emit(int number_photons, int recurse, vector<double> &points, vector<Photon> &photons, vector<long> &tags) {
+void Scene::emit(int number_photons, int recurse, vector<double> &points, vector<Photon> &photons, vector<long long> &tags) {
     Light *light = light_list;
     while (light != 0) {
         for (int i = 0; i < number_photons; i++) {
-//            trace_photon(recurse, points, photons, tags, light);
+            Vector direction = get_random_direction();
+            Ray photon_path = Ray(light->position, direction);
+            Photon photon = Photon(photon_path, light->intensity, PHOTON_NORMAL);
+            trace_photon(photon, recurse, points, photons, tags);
         }
         for (Photon p: photons) {
             // scale by number of photons from light
@@ -179,8 +267,8 @@ void Scene::add_light(Light *light) {
     this->light_list = light;
 }
 
-//void Scene::set_photon_map() {
-//    photon_map = new PhotonMap(object_list, light_list);
-//    emit(50000, 50, points, photons, tags);
-//    photon_map->build_kd_tree(points, tree, tags);
-//}
+void Scene::set_photon_map() {
+    photon_map = new PhotonMap(object_list, light_list);
+    emit(50000, 50, points, photons, tags);
+    photon_map->build_kd_tree(points, tree, tags);
+}

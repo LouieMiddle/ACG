@@ -46,12 +46,14 @@
 // classes that contain cameras, all derived from Camera
 #include "simple_camera.h"
 #include "full_camera.h"
+#include "phong_material_photon_mapping.h"
 
 // classes for photon mapping
 //#include "photon_map.h"
 
 using namespace std;
 
+// Standard phong colours
 Phong *white = new Phong(Colour(0.2f, 0.2f, 0.2f), Colour(0.4f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
 Phong *red = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
 Phong *green = new Phong(Colour(0.0f, 0.2f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
@@ -59,6 +61,15 @@ Phong *blue = new Phong(Colour(0.0f, 0.0f, 0.2f), Colour(0.0f, 0.0f, 0.4f), Colo
 Phong *yellow = new Phong(Colour(0.2f, 0.2f, 0.0f), Colour(0.4f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
 Phong *purple = new Phong(Colour(0.2f, 0.0f, 0.2f), Colour(0.4f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
 Phong *light_blue = new Phong(Colour(0.0f, 0.2f, 0.2f), Colour(0.0f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
+
+// Phong colours for photon mapping
+PhongPhotonMapping *white_pm = new PhongPhotonMapping(Colour(0.2f, 0.2f, 0.2f), Colour(0.4f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f,0.6f,0.0f);
+PhongPhotonMapping *red_pm = new PhongPhotonMapping(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
+PhongPhotonMapping *green_pm = new PhongPhotonMapping(Colour(0.0f, 0.2f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
+PhongPhotonMapping *blue_pm = new PhongPhotonMapping(Colour(0.0f, 0.0f, 0.2f), Colour(0.0f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
+PhongPhotonMapping *yellow_pm = new PhongPhotonMapping(Colour(0.2f, 0.2f, 0.0f), Colour(0.4f, 0.4f, 0.0f),Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
+PhongPhotonMapping *purple_pm = new PhongPhotonMapping(Colour(0.2f, 0.0f, 0.2f), Colour(0.4f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
+PhongPhotonMapping *light_blue_pm = new PhongPhotonMapping(Colour(0.0f, 0.2f, 0.2f), Colour(0.0f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
 
 Transform *rotate_90 = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
                                      0.0f, 0.0f, 1.0f, 0.0f,
@@ -81,17 +92,27 @@ void add_lights(Scene &scene) {
 //    scene.add_light(bottom_light);
 }
 
-void add_cornell_box(Scene &scene) {
+void add_cornell_box(Scene &scene, bool photon_map) {
     Plane *back_white_plane = new Plane(0.0f, 0.0f, 1.0f, -2.0f);
     Plane *top_blue_plane = new Plane(0.0f, 1.0f, 0.0f, -2.0f);
     Plane *bottom_white_plane = new Plane(0.0f, 1.0f, 0.0f, 2.0f);
     Plane *right_green_plane = new Plane(1.0f, 0.0f, 0.0f, -2.0f);
     Plane *left_red_plane = new Plane(1.0f, 0.0f, 0.0f, 2.0f);
-    back_white_plane->set_material(white);
-    top_blue_plane->set_material(blue);
-    bottom_white_plane->set_material(white);
-    right_green_plane->set_material(green);
-    left_red_plane->set_material(red);
+
+    if (!photon_map) {
+        back_white_plane->set_material(white);
+        top_blue_plane->set_material(blue);
+        bottom_white_plane->set_material(white);
+        right_green_plane->set_material(green);
+        left_red_plane->set_material(red);
+    } else {
+        back_white_plane->set_material(white_pm);
+        top_blue_plane->set_material(blue_pm);
+        bottom_white_plane->set_material(white_pm);
+        right_green_plane->set_material(green_pm);
+        left_red_plane->set_material(red_pm);
+    }
+
     scene.add_object(back_white_plane);
     scene.add_object(top_blue_plane);
     scene.add_object(bottom_white_plane);
@@ -187,6 +208,17 @@ void add_csg(Scene &scene) {
     scene.add_object(combine_both);
 }
 
+void add_photon_mapping(Scene &scene) {
+    add_cornell_box(scene, true);
+
+    Sphere *sphere = new Sphere(Vertex(0.0f, 0.0f, 0.0f), 0.5f);
+    sphere->set_material(yellow_pm);
+    scene.add_object(sphere);
+
+    // After all objects and lights added generate photon map
+    scene.set_photon_map();
+}
+
 void build_scene(Scene &scene) {
     // The following move_teapot allows 4D homogeneous coordinates to be transformed. It moves the supplied teapot model to somewhere visible.
     Transform *move_teapot = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
@@ -200,18 +232,23 @@ void build_scene(Scene &scene) {
     teapot->set_material(red);
 //    scene.add_object(teapot);
 
-
     //  Read in the bunny model.
 //    PolyMesh *bunny = new PolyMesh("bunny.ply", true);
 //    teapot->apply_transform();
 //    bunny->set_material(red);
 //    scene.add_object(bunny);
 
+    // Always need lights
     add_lights(scene);
-    add_cornell_box(scene);
-    add_reflective_refractive(scene);
+
+    // For standard ray tracing
+//    add_cornell_box(scene, false);
+//    add_reflective_refractive(scene);
 //    add_quadratic_surfaces(scene);
 //    add_csg(scene);
+
+    // If using photon mapping don't use above
+    add_photon_mapping(scene);
 }
 
 // This is the entry point function to the program.
@@ -226,9 +263,6 @@ int main(int argc, char *argv[]) {
 
     // Setup the scene
     build_scene(scene);
-
-    // Generate the photon map
-//    scene.set_photon_map();
 
     // Declare a camera
     Vertex position = *new Vertex(0.0f, 0.0f, -1.0f);

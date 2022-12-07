@@ -22,9 +22,9 @@
 #include "colour.h"
 
 enum PhotonMode {
-    PHOTON_DIRECT = 0,
-    PHOTON_INDIRECT = 1,
-    PHOTON_SHADOW = 2
+    PHOTON_NORMAL = 0,
+    PHOTON_SHADOW = 1,
+    PHOTON_CAUSTIC = 2
 };
 
 class Photon {

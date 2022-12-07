@@ -62,7 +62,6 @@ void GlobalMaterial::refract_ray(Vector &view, Vector &normal, Vector &refract_r
     float eta = eta_i / eta_t;
     float cos_t = sqrt(1.0f - (eta * eta) * (1.0f - cos_i * cos_i));
     refract_ray = eta * view + (eta * cos_i - cos_t) * n;
-//    cout << "1 " << refract_ray.x << " " << refract_ray.y << " " << refract_ray.z << "\n";
 }
 
 // reflection and recursion computation
@@ -83,7 +82,6 @@ Colour GlobalMaterial::compute_once(Ray &viewer, Hit &hit, int recurse) {
             float refraction_depth;
             Colour refract_colour = Colour(0.0f, 0.0f, 0.0f);
             refract_ray(viewer.direction, hit.normal, refraction_ray.direction, cos_i);
-//            cout << "2 " << refraction_ray.direction.x << " " << refraction_ray.direction.y << " " << refraction_ray.direction.z << "\n";
             refraction_ray.direction.normalise();
             refraction_ray.position = outside ? hit.position - bias : hit.position + bias;
             environment->raytrace(refraction_ray, recurse - 1, refract_colour, refraction_depth);

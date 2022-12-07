@@ -26,6 +26,9 @@
 
 class Material {
 public:
+    float kd;
+    float ks;
+
     // compute_once is called once per intersection
     virtual Colour compute_once(Ray &viewer, Hit &hit, int recurse) {
         Colour result;
@@ -44,5 +47,21 @@ public:
         return result;
     }
 
-    // You will need additional material methods to support Photon-mapping.
+    virtual Colour compute_ambient() {
+        Colour result;
+        result.r = 0.0f;
+        result.g = 0.0f;
+        result.b = 0.0f;
+        return result;
+    };
+
+    virtual Colour compute_diffuse(Hit &hit, Vector &ldir) {
+        Colour result;
+        result.r = 0.0f;
+        result.g = 0.0f;
+        result.b = 0.0f;
+        return result;
+    };
+
+    // TODO: You will need additional material methods to support Photon-mapping.
 };

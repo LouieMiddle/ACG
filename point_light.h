@@ -8,9 +8,6 @@ using namespace std;
 
 class PointLight : public Light {
 public:
-    Vertex position;
-    Colour intensity;
-
     PointLight();
 
     PointLight(Vertex p_position, Colour p_intensity);

@@ -28,6 +28,7 @@
 #include "alglib/stdafx.h"
 #include "alglib/alglibmisc.h"
 #include "photon_map.h"
+#include <random>
 
 // Scene is a class that is used to build a scene database of objects
 // and lights and then trace a ray through it.
@@ -38,10 +39,10 @@ class Scene : public Environment {
 public:
     Object *object_list;
     Light *light_list;
-//    PhotonMap *photon_map;
+    PhotonMap *photon_map;
     vector<Photon> photons;
     vector<double> points;
-    vector<long> tags;
+    vector<long long> tags;
     kdtree tree;
 
     Scene();
@@ -60,11 +61,13 @@ public:
     // raytrace a shadow ray.
     bool shadowtrace(Ray, float limit);
 
-    void emit(int number_photons, int recurse, vector<double> &points, vector<Photon> &photons, vector<long> &tags);
+    void emit(int number_photons, int recurse, vector<double> &points, vector<Photon> &photons, vector<long long> &tags);
 
     void add_object(Object *obj);
 
     void add_light(Light *light);
 
     void set_photon_map();
+
+    void trace_photon(Photon photon, int recurse, vector<double> &points, vector<Photon> &photons, vector<long long> &tags);
 };

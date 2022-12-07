@@ -26,9 +26,6 @@
 
 class DirectionalLight : public Light {
 public:
-    Vector direction;
-    Colour intensity;
-
     DirectionalLight();
 
     DirectionalLight(Vector dir, Colour col);
