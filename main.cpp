@@ -112,6 +112,11 @@ void add_reflective_refractive(Scene &scene) {
     reflective_white_glass->include_material(white);
     reflective_white_glass->include_material(reflective_glass);
 
+    // This looks like a slightly weird material, wouldn't reccomend
+    CompoundMaterial *refractive_white_glass = new CompoundMaterial(2);
+    refractive_white_glass->include_material(white);
+    refractive_white_glass->include_material(refractive_glass);
+
     yellow_sphere->set_material(yellow);
     refractive_sphere->set_material(refractive_glass);
     reflective_sphere->set_material(reflective_white_glass);

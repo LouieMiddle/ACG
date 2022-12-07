@@ -22,8 +22,6 @@
 
 #include "object.h"
 
-using namespace std;
-
 class Sphere : public Object {
     Vertex center;
     float radius;

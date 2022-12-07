@@ -48,31 +48,21 @@ Hit *Sphere::intersection(Ray ray) {
 
     float ds = sqrtf(disc);
 
-    float q = (b > 0) ? -0.5 * (b + ds) : -0.5 * (b - ds);
+    float t0 = (-b - ds) / 2.0f;
+    float t1 = (-b + ds) / 2.0f;
 
-    float t0 = q / a;
-    float t1 = c / q;
+    Hit *hit0 = new Hit();
+    hit0->what = this;
+    hit0->t = t0;
+    hit0->entering = true;
 
-    if (t0 > t1) {
-        swap(t0, t1);
-    }
+    hit0->position = ray.position + hit0->t * ray.direction;
+    hit0->normal = hit0->position - center;
+    hit0->normal.normalise();
 
-    Hit *hit0 = 0;
-    if (t0 > 0)  {
-        hit0 = new Hit();
-        hit0->what = this;
-        hit0->t = t0;
-        hit0->entering = true;
-
-        hit0->position = ray.position + hit0->t * ray.direction;
-        hit0->normal = hit0->position - center;
-        hit0->normal.normalise();
-
-        if (t1 < 0) {
-            hit0->next = 0;
-            return hit0;
-        }
-    }
+//    if (hit0->normal.dot(ray.direction) > 0.0) {
+//        hit0->normal.negate();
+//    }
 
     Hit *hit1 = new Hit();
     hit1->what = this;
@@ -83,15 +73,14 @@ Hit *Sphere::intersection(Ray ray) {
     hit1->normal = hit1->position - center;
     hit1->normal.normalise();
 
+//    if (hit1->normal.dot(ray.direction) > 0.0) {
+//        hit1->normal.negate();
+//    }
+
+    hit0->next = hit1;
     hit1->next = 0;
 
-    if (hit0 != 0) {
-        hit0->next = hit1;
-        return hit0;
-    } else {
-        delete hit0;
-        return hit1;
-    }
+    return hit0;
 }
 
 void Sphere::apply_transform(Transform &transform) {
