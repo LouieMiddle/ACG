@@ -5046,7 +5046,7 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, ae_bool v, ae_state
     ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); /* strict "less" because we need space for trailing zero */
     serializer->bytes_written += bytes_appended;
         
-    /* append to buffer */
+    /* append_hits to buffer */
 #ifdef AE_USE_CPP_SERIALIZATION
     if( serializer->mode==AE_SM_TO_CPPSTRING )
     {
@@ -5085,7 +5085,7 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v, ae_state
     ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); /* strict "less" because we need space for trailing zero */
     serializer->bytes_written += bytes_appended;
         
-    /* append to buffer */
+    /* append_hits to buffer */
 #ifdef AE_USE_CPP_SERIALIZATION
     if( serializer->mode==AE_SM_TO_CPPSTRING )
     {
@@ -5124,7 +5124,7 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v, ae_s
     ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); /* strict "less" because we need space for trailing zero */
     serializer->bytes_written += bytes_appended;
         
-    /* append to buffer */
+    /* append_hits to buffer */
 #ifdef AE_USE_CPP_SERIALIZATION
     if( serializer->mode==AE_SM_TO_CPPSTRING )
     {
@@ -5163,7 +5163,7 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v, ae_stat
     ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); /* strict "less" because we need space for trailing zero */
     serializer->bytes_written += bytes_appended;
         
-    /* append to buffer */
+    /* append_hits to buffer */
 #ifdef AE_USE_CPP_SERIALIZATION
     if( serializer->mode==AE_SM_TO_CPPSTRING )
     {
@@ -9432,7 +9432,7 @@ void alglib::read_csv(const char *filename, char separator, int flags, alglib::r
     // Normalize file contents:
     // * replace 0x0 by spaces
     // * remove trailing spaces and newlines
-    // * append trailing '\n' and '\0' characters
+    // * append_hits trailing '\n' and '\0' characters
     // Return if file contains only spaces/newlines.
     //
     for(size_t i=0; i<filesize; i++)

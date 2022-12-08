@@ -46,10 +46,9 @@
 // classes that contain cameras, all derived from Camera
 #include "simple_camera.h"
 #include "full_camera.h"
-#include "phong_material_photon_mapping.h"
 
 // classes for photon mapping
-//#include "photon_map.h"
+#include "phong_material_photon_mapping.h"
 
 using namespace std;
 

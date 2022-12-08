@@ -39,10 +39,10 @@ void GlobalMaterial::fresnel(float &kr, float cos_i) {
     if (sin_t >= 1) {
         kr = 1;
     } else {
-        float cost = sqrtf(max(0.0f, 1.0f - sin_t * sin_t));
+        float cos_t = sqrtf(max(0.0f, 1.0f - sin_t * sin_t));
         cos_i = fabsf(cos_i);
-        float rs = ((eta_t * cos_i) - (eta_i * cost)) / ((eta_t * cos_i) + (eta_i * cost));
-        float rp = ((eta_i * cos_i) - (eta_t * cost)) / ((eta_i * cos_i) + (eta_t * cost));
+        float rs = ((eta_t * cos_i) - (eta_i * cos_t)) / ((eta_t * cos_i) + (eta_i * cos_t));
+        float rp = ((eta_i * cos_i) - (eta_t * cos_t)) / ((eta_i * cos_i) + (eta_t * cos_t));
         kr = (rs * rs + rp * rp) / 2.0f;
     }
 }

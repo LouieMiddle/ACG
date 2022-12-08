@@ -20,11 +20,11 @@ public:
 
     PhotonMap(Object *p_objects, Light *p_lights);
 
-    Colour estimate_radiance(Hit &hit, vector<Photon *> local_photons);
-
-    vector<Photon *> gather_photons(Vertex position, int neighbours, kdtree &tree, vector<Photon> &photons);
-
     void build_kd_tree(vector<double> &points, kdtree &tree, vector<long long> &tags);
+
+    void gather_photons(Vertex position, int neighbours, kdtree &tree, vector<Photon> &photons, vector<Photon *> &local_photons);
+
+    void estimate_radiance(Hit &hit, const vector<Photon *>& local_photons, Colour &colour);
 
     void store_photon(Photon p, vector<double> &points, vector<Photon> &photons, vector<long long> &tags);
 };

@@ -23,80 +23,6 @@ using namespace std;
 #include <string.h>
 #include "csg_object.h"
 
-Hit *merge(Hit *head1, Hit *head2) {
-    if (head1 == 0)
-        return head2;
-    if (head2 == 0)
-        return head1;
-
-    Hit *temp;
-    if (head1->t < head2->t) {
-        temp = head1;
-        temp->next = merge(head1->next, head2);
-    } else {
-        temp = head2;
-        temp->next = merge(head1, head2->next);
-    }
-
-    return temp;
-}
-
-Hit *mid_point(Hit *head) {
-    if (head == 0 || head->next == 0)
-        return head;
-
-    Hit *fast = head;
-    Hit *slow = head;
-
-    while (fast != 0 && fast->next != 0) {
-        fast = fast->next;
-
-        if (fast->next == 0)
-            break;
-
-        fast = fast->next;
-        slow = slow->next;
-    }
-
-    return slow;
-}
-
-// TODO: Cite https://codeforgeek.com/sort-linked-lists-cpp/
-// TODO: Add to utils class
-Hit *merge_sort(Hit *head) {
-    if (head == 0 || head->next == 0)
-        return head;
-
-    Hit *mid = mid_point(head);
-    Hit *a = head;
-    Hit *b = mid->next;
-
-    mid->next = 0;
-
-    a = merge_sort(a);
-    b = merge_sort(b);
-
-    Hit *c = merge(a, b);
-
-    return c;
-}
-
-// TODO: Cite https://www.geeksforgeeks.org/cpp-program-for-inserting-a-node-in-a-linked-list/
-// TODO: Add to utils class
-void append(Hit **head_ref, Hit *new_data) {
-    Hit *last = *head_ref;
-
-    if (*head_ref == 0) {
-        *head_ref = new_data;
-        return;
-    }
-
-    while (last->next != 0)
-        last = last->next;
-
-    last->next = new_data;
-}
-
 CSG::CSG(CSGMode p_mode, Object *p_left, Object *p_right) {
     mode = p_mode;
     left = p_left;
@@ -164,7 +90,7 @@ Hit *CSG::filter_hits(Hit *hits) {
                 Hit *temp = hits;
                 hits = hits->next;
                 temp->next = 0;
-                append(&result, temp);
+                utils::append_hits(&result, temp);
             }
         } else {
             Hit *temp = hits;
@@ -182,19 +108,10 @@ Hit *CSG::filter_hits(Hit *hits) {
     return result;
 }
 
-// TODO: Add to utils
-void printlist(Hit *head) {
-    while (head != 0) {
-        cout << head->t << " ";
-        head = head->next;
-    }
-    cout << endl;
-}
-
 Hit *CSG::intersection(Ray ray) {
     Hit *hits = left->intersection(ray);
-    append(&hits, right->intersection(ray));
-    hits = merge_sort(hits);
+    utils::append_hits(&hits, right->intersection(ray));
+    hits = utils::merge_sort_hits(hits);
     return filter_hits(hits);
 }
 

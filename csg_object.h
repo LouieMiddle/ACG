@@ -23,6 +23,7 @@
 #pragma once
 
 #include "object.h"
+#include "utils.h"
 
 enum CSGMode {
     CSG_UNION = 0,
@@ -35,6 +36,9 @@ static const char *CSG_TYPE = "3CSG";
 class CSG : public Object {
     CSGMode mode;
 public:
+    Object *left;
+    Object *right;
+
     CSG(CSGMode p_mode, Object *p_left, Object *p_right);
 
     bool operation_allowed(bool lhit, bool inl, bool  inr);
@@ -44,7 +48,4 @@ public:
     Hit *intersection(Ray ray);
 
     void apply_transform(Transform &transform);
-
-    Object *left;
-    Object *right;
 };

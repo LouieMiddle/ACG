@@ -28,7 +28,7 @@
 #include "alglib/stdafx.h"
 #include "alglib/alglibmisc.h"
 #include "photon_map.h"
-#include <random>
+#include "utils.h"
 
 // Scene is a class that is used to build a scene database of objects
 // and lights and then trace a ray through it.

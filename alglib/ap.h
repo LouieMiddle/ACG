@@ -570,7 +570,7 @@ Serializer:
     the stream and until first non-space non-linefeed character is found
   * read exactly cnt symbols  from  stream  to  buffer;  check  that  all
     symbols being read are non-space non-linefeed ones
-  * append trailing zero symbol to buffer
+  * append_hits trailing zero symbol to buffer
   * return value must be zero on success, non-zero if  even  one  of  the
     conditions above fails. When reader returns non-zero value,  contents
     of buf is not used.
@@ -2088,7 +2088,7 @@ their failures:
 * trace tags are case-insensitive
 * spaces/tabs are NOT allowed in the tags string
 
-Trace log is saved to file "filename", which is opened in the  append
+Trace log is saved to file "filename", which is opened in the  append_hits
 mode. If no file with such name  can  be  opened,  tracing  won't  be
 performed (but no exception will be generated).
 ********************************************************************/

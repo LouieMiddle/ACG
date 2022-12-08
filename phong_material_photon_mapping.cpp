@@ -38,75 +38,54 @@ Colour PhongPhotonMapping::compute_ambient() {
 }
 
 Colour PhongPhotonMapping::compute_diffuse(Hit &hit, Vector &ldir) {
-    Colour result;
-
-    float diff;
-
     Vector tolight;
-
-    result.r = 0.0f;
-    result.g = 0.0f;
-    result.b = 0.0f;
-
     tolight = ldir;
     tolight.negate();
 
+    float diff;
     diff = hit.normal.dot(tolight);
 
     // Scene.raytrace() does this test, but let's keep it here in case that changes or we get called from elsewhere.
     if (diff < 0.0f) // light is behind surface
     {
-        return result;
+        return Colour(0.0f, 0.0f, 0.0f);
     }
 
-    // diffuse
-
-    result += diffuse * diff;
-
-    return result;
+    return diffuse * diff;
 }
 
 // The compute_per_light() method supplies the specular terms only for photon mapping
 Colour PhongPhotonMapping::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
-    Colour result;
-
-    float diff;
-
     Vector tolight;
-    Vector toviewer;
-
-    result.r = 0.0f;
-    result.g = 0.0f;
-    result.b = 0.0f;
-
     tolight = ldir;
     tolight.negate();
 
+    float diff;
+    diff = hit.normal.dot(tolight);
+
+
+    Vector toviewer;
     toviewer = viewer;
     toviewer.negate();
 
-    diff = hit.normal.dot(tolight);
 
     // Scene.raytrace() does this test, but let's keep it here in case that changes or we get called from elsewhere.
     if (diff < 0.0f) // light is behind surface
     {
-        return result;
+        return Colour(0.0f, 0.0f, 0.0f);
     }
 
-    // the specular component
 
     Vector r;
-
     hit.normal.reflection(tolight, r);
     r.normalise();
 
     float h = r.dot(toviewer);
-
     if (h > 0.0f) {
         float p = (float) pow(h, power);
 
-        result += specular * p;
+        return specular * p;
     }
 
-    return result;
+    return Colour(0.0f, 0.0f, 0.0f);
 }
