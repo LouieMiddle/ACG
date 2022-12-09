@@ -24,20 +24,24 @@ void PhotonMap::build_kd_tree(vector<double> &points, kdtree &tree, vector<long 
 
 // gather nearest neighbours at position
 void PhotonMap::gather_photons(Vertex position, int neighbours, kdtree &tree, vector<Photon> &photons, vector<Photon *> &local_photons) {
-    vector<double> point = {position.x, position.y, position.z};
-    real_1d_array point_array;
-    point_array.setcontent(3, point.data());
-    kdtreequeryknn(tree, point_array, neighbours);
-    integer_1d_array output_tags = "[]";
-    kdtreequeryresultstags(tree, output_tags);
+    // Check photons aren't empty in case of standard ray trace
+    if (photons.size() != 0) {
+        vector<double> point = {position.x, position.y, position.z};
+        real_1d_array point_array;
+        point_array.setcontent(3, point.data());
+        kdtreequeryknn(tree, point_array, neighbours);
+        integer_1d_array output_tags = "[]";
+        kdtreequeryresultstags(tree, output_tags);
 
-    for (int i = 0; i < neighbours; i++) {
-        local_photons.push_back(&photons[output_tags[i]]);
+        for (int i = 0; i < neighbours; i++) {
+            local_photons.push_back(&photons[output_tags[i]]);
+        }
     }
 }
 
 // estimate radiance for a given point
-void PhotonMap::estimate_radiance(Hit &hit, const vector<Photon *> &local_photons, Colour &radiance) {
+Colour PhotonMap::estimate_radiance(Hit &hit, const vector<Photon *> &local_photons) {
+    Colour radiance = Colour(0.0f, 0.0f, 0.0f);
     float max_dist;
     for (Photon *p: local_photons) {
         float dist = (p->path.position - hit.position).length();
@@ -59,6 +63,7 @@ void PhotonMap::estimate_radiance(Hit &hit, const vector<Photon *> &local_photon
     }
     // scale by area sampled
     radiance = radiance * (1 / ((float) M_PI * max_dist * max_dist));
+    return radiance;
 }
 
 void PhotonMap::store_photon(Photon p, vector<double> &points, vector<Photon> &photons, vector<long long> &tags) {

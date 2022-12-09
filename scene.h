@@ -39,11 +39,19 @@ class Scene : public Environment {
 public:
     Object *object_list;
     Light *light_list;
+
     PhotonMap *photon_map;
     vector<Photon> photons;
     vector<double> points;
     vector<long long> tags;
     kdtree tree;
+
+    // Second photon map for caustics as described by Jensen
+    PhotonMap *caustic_photon_map;
+    vector<Photon> caustic_photons;
+    vector<double> caustic_points;
+    vector<long long> caustic_tags;
+    kdtree caustic_tree;
 
     Scene();
 
@@ -61,7 +69,7 @@ public:
     // raytrace a shadow ray.
     bool shadowtrace(Ray, float limit);
 
-    void emit(int number_photons, int recurse, vector<double> &points, vector<Photon> &photons, vector<long long> &tags);
+    void emit_photons(int number_photons, int recurse, vector<double> &points, vector<Photon> &photons, vector<long long> &tags);
 
     void add_object(Object *obj);
 

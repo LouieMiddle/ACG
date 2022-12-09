@@ -83,20 +83,20 @@ Transform *rotate_180 = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
 
 void add_lights(Scene &scene) {
     DirectionalLight *dl = new DirectionalLight(Vector(1.0f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
-    PointLight *top_light = new PointLight(Vertex(-1.8f, 1.8f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
-    PointLight *bottom_light = new PointLight(Vertex(0.0f, -1.8f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
+    PointLight *top_light = new PointLight(Vertex(-1.2f, 1.0f, 3.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
+    PointLight *bottom_light = new PointLight(Vertex(1.2f, -1.0f, 3.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
 
 //    scene.add_light(dl);
     scene.add_light(top_light);
-//    scene.add_light(bottom_light);
+    scene.add_light(bottom_light);
 }
 
 void add_cornell_box(Scene &scene, bool photon_map) {
-    Plane *back_white_plane = new Plane(0.0f, 0.0f, 1.0f, -2.0f);
+    Plane *back_white_plane = new Plane(0.0f, 0.0f, 1.0f, -10.0f);
     Plane *top_blue_plane = new Plane(0.0f, 1.0f, 0.0f, -2.0f);
-    Plane *bottom_white_plane = new Plane(0.0f, 1.0f, 0.0f, 2.0f);
-    Plane *right_green_plane = new Plane(1.0f, 0.0f, 0.0f, -2.0f);
-    Plane *left_red_plane = new Plane(1.0f, 0.0f, 0.0f, 2.0f);
+    Plane *bottom_white_plane = new Plane(0.0f, 1.0f, 0.0f, 2.5f);
+    Plane *right_green_plane = new Plane(1.0f, 0.0f, 0.0f, -3.5f);
+    Plane *left_red_plane = new Plane(1.0f, 0.0f, 0.0f, 3.5f);
 
     if (!photon_map) {
         back_white_plane->set_material(white);
@@ -207,46 +207,57 @@ void add_csg(Scene &scene) {
     scene.add_object(combine_both);
 }
 
+void add_standard_ray_trace(Scene &scene) {
+    // The following move_teapot allows 4D homogeneous coordinates to be transformed. It moves the supplied teapot model to somewhere visible.
+    Transform *move_teapot = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
+                                           0.0f, 0.0f, 1.0f, -2.0f,
+                                           0.0f, 1.0f, 0.0f, 5.0f,
+                                           0.0f, 0.0f, 0.0f, 1.0f);
+
+    //  Read in the teapot model.
+    PolyMesh *teapot = new PolyMesh("teapot_smaller.ply", true);
+    teapot->apply_transform(*move_teapot);
+    teapot->set_material(yellow);
+    scene.add_object(teapot);
+
+    // For standard ray tracing
+    add_cornell_box(scene, false);
+//    add_reflective_refractive(scene);
+//    add_quadratic_surfaces(scene);
+//    add_csg(scene);
+}
+
 void add_photon_mapping(Scene &scene) {
     add_cornell_box(scene, true);
 
-    Sphere *sphere = new Sphere(Vertex(0.0f, 0.0f, 0.0f), 0.5f);
-    sphere->set_material(yellow_pm);
-    scene.add_object(sphere);
+//    Sphere *sphere = new Sphere(Vertex(0.0f, 0.0f, 0.0f), 0.5f);
+//    sphere->set_material(yellow_pm);
+//    scene.add_object(sphere);
+
+    // The following move_teapot allows 4D homogeneous coordinates to be transformed. It moves the supplied teapot model to somewhere visible.
+    Transform *move_teapot = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
+                                           0.0f, 0.0f, 1.0f, -2.0f,
+                                           0.0f, 1.0f, 0.0f, 5.0f,
+                                           0.0f, 0.0f, 0.0f, 1.0f);
+
+    //  Read in the teapot model.
+    PolyMesh *teapot = new PolyMesh("teapot_smaller.ply", true);
+    teapot->apply_transform(*move_teapot);
+    teapot->set_material(yellow_pm);
+    scene.add_object(teapot);
 
     // After all objects and lights added generate photon map
     scene.set_photon_map();
 }
 
 void build_scene(Scene &scene) {
-    // The following move_teapot allows 4D homogeneous coordinates to be transformed. It moves the supplied teapot model to somewhere visible.
-    Transform *move_teapot = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
-                                           0.0f, 0.0f, 1.0f, -1.0f,
-                                           0.0f, 1.0f, 0.0f, 10.0f,
-                                           0.0f, 0.0f, 0.0f, 1.0f);
-
-    //  Read in the teapot model.
-    PolyMesh *teapot = new PolyMesh("teapot_smaller.ply", true);
-    teapot->apply_transform(*move_teapot);
-    teapot->set_material(red);
-//    scene.add_object(teapot);
-
-    //  Read in the bunny model.
-//    PolyMesh *bunny = new PolyMesh("bunny.ply", true);
-//    teapot->apply_transform();
-//    bunny->set_material(red);
-//    scene.add_object(bunny);
-
     // Always need lights
     add_lights(scene);
 
-    // For standard ray tracing
-//    add_cornell_box(scene, false);
-//    add_reflective_refractive(scene);
-//    add_quadratic_surfaces(scene);
-//    add_csg(scene);
+    // Standard ray tracing scene
+//    add_standard_ray_trace(scene);
 
-    // If using photon mapping don't use above
+    // If using photon mapping use below method
     add_photon_mapping(scene);
 }
 
@@ -264,7 +275,7 @@ int main(int argc, char *argv[]) {
     build_scene(scene);
 
     // Declare a camera
-    Vertex position = *new Vertex(0.0f, 0.0f, -1.0f);
+    Vertex position = *new Vertex(0.0f, 0.0f, 1.0f);
     Vector look_at = *new Vector(0.0f, 0.0f, 1.0f);
     Vector up = *new Vector(0.0f, 1.0f, 0.0f);
     Camera *camera = new FullCamera(0.5f, position, look_at, up);

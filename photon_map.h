@@ -24,7 +24,7 @@ public:
 
     void gather_photons(Vertex position, int neighbours, kdtree &tree, vector<Photon> &photons, vector<Photon *> &local_photons);
 
-    void estimate_radiance(Hit &hit, const vector<Photon *>& local_photons, Colour &colour);
+    Colour estimate_radiance(Hit &hit, const vector<Photon *>& local_photons);
 
     void store_photon(Photon p, vector<double> &points, vector<Photon> &photons, vector<long long> &tags);
 };

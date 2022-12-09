@@ -107,7 +107,7 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
         colour = colour + best_hit->what->material->compute_once(ray, *best_hit,
                                                                  recurse); // this will be the global components such as ambient or reflect/refract
 
-        photon_map->estimate_radiance(*best_hit, local_photons, colour);
+        colour = colour + photon_map->estimate_radiance(*best_hit, local_photons);
 
         // next, compute the light contribution for each light in the scene.
         Light *light = light_list;
@@ -190,10 +190,11 @@ void Scene::trace_photon(Photon photon, int recurse, vector<double> &points, vec
 }
 
 // emit photons from light sources
-void Scene::emit(int number_photons, int recurse, vector<double> &points, vector<Photon> &photons, vector<long long> &tags) {
+void Scene::emit_photons(int number_photons, int recurse, vector<double> &points, vector<Photon> &photons, vector<long long> &tags) {
     Light *light = light_list;
     while (light != 0) {
         for (int i = 0; i < number_photons; i++) {
+            // TODO: Currently this will only work for point lights
             Vector direction = utils::get_random_direction();
             Ray photon_path = Ray(light->position, direction);
             Photon photon = Photon(photon_path, light->intensity, PHOTON_NORMAL);
@@ -219,6 +220,10 @@ void Scene::add_light(Light *light) {
 
 void Scene::set_photon_map() {
     photon_map = new PhotonMap(object_list, light_list);
-    emit(50000, 50, points, photons, tags);
+    emit_photons(50000, 50, points, photons, tags);
     photon_map->build_kd_tree(points, tree, tags);
+
+//    photon_map = new PhotonMap(object_list, light_list);
+//    emit_photons(50000, 50, points, photons, tags);
+//    photon_map->build_kd_tree(points, tree, tags);
 }

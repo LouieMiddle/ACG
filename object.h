@@ -30,6 +30,9 @@ public:
     Object *next;
     Material *material;
 
+    Vertex centre;
+    float radius;
+
     Object() {
         next = (Object *) 0;
         material = (Material *) 0;

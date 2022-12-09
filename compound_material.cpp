@@ -62,3 +62,27 @@ Colour CompoundMaterial::compute_per_light(Vector &viewer, Hit &hit, Vector &ldi
 
     return result;
 }
+
+Colour CompoundMaterial::compute_ambient() {
+    Colour result;
+
+    for (int i = 0; i < number; i += 1) {
+        if (materials[i] == 0) return result;
+
+        result += materials[i]->compute_ambient();
+    }
+
+    return result;
+}
+
+Colour CompoundMaterial::compute_diffuse(Hit &hit, Vector &ldir) {
+    Colour result;
+
+    for (int i = 0; i < number; i += 1) {
+        if (materials[i] == 0) return result;
+
+        result += materials[i]->compute_diffuse(hit, ldir);
+    }
+
+    return result;
+}
