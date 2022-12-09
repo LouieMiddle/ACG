@@ -16,7 +16,7 @@
 * produced it.
 */
 
-/* CSG is an object that is built by Constructive Solid Geometry from two sub-objects.*/
+/* CSG is an object that is built by Constructive Solid Geometry from two sub-object_list.*/
 
 using namespace std;
 

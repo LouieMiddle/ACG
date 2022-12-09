@@ -496,7 +496,7 @@ typedef struct ae_state
     
     /*
      * pointer to the top block in a stack of frames
-     * which hold dynamically allocated objects
+     * which hold dynamically allocated object_list
      */
     ae_dyn_block * volatile p_top_block;
     ae_dyn_block last_block;
@@ -745,7 +745,7 @@ typedef struct ae_shared_pool
     
     /*
      * list of recycled OBJECTS:
-     * 1. entries in this list store pointers to recycled objects
+     * 1. entries in this list store pointers to recycled object_list
      * 2. every time we retrieve object, we retrieve first entry from this list,
      *    move it to recycled_entries and return its obj field to caller/
      */
@@ -753,7 +753,7 @@ typedef struct ae_shared_pool
     
     /* 
      * list of recycled ENTRIES:
-     * 1. this list holds entries which are not used to store recycled objects;
+     * 1. this list holds entries which are not used to store recycled object_list;
      *    every time recycled object is retrieved, its entry is moved to this list.
      * 2. every time object is recycled, we try to fetch entry for him from this list
      *    before allocating it with malloc()
@@ -763,7 +763,7 @@ typedef struct ae_shared_pool
     /* enumeration pointer, points to current recycled object*/
     ae_shared_pool_entry    * volatile enumeration_counter;
     
-    /* size of object; this field is used when we call malloc() for new objects */
+    /* size of object; this field is used when we call malloc() for new object_list */
     ae_int_t                size_of_object;
     
     /* initializer function; accepts pointer to malloc'ed object, initializes its fields */
@@ -1531,7 +1531,7 @@ public:
     // For wrapper object allocated with allocate_own() this function
     // changes length, completely dropping previous contents.
     //
-    // It does not work (throws exception) for frozen proxy objects.
+    // It does not work (throws exception) for frozen proxy object_list.
     //
     void setlength(ae_int_t iLen);
     

@@ -2147,7 +2147,7 @@ dots, underscores, minus signs, which are grouped into words separated by
 spaces and CR+LF.
 
 We recommend you to read comments on string version of serializer to find
-out more about serialization of AlGLIB objects.
+out more about serialization of AlGLIB object_list.
 *************************************************************************/
 void kdtreeserialize(kdtree &obj, std::ostream &s_out)
 {

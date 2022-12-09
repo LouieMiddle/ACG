@@ -16,7 +16,7 @@
 * produced it.
 */
 
-// Light is the base class for lights.
+// Light is the base class for light_list.
 
 #pragma once
 
@@ -44,8 +44,7 @@ public:
     }
 
     // Get the intensity of the light in the direction of the surface
-    virtual void get_intensity(Vertex &surface, Colour &intensity) {
-    }
+    virtual void get_intensity(Vertex &surface, Colour &p_intensity) {}
 
     // TODO: You will need additional light methods to support Photon-mapping.
 };

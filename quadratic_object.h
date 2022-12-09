@@ -16,7 +16,7 @@
 * produced it.
 */
 
-// The Quadratic Object defines and intersects with quadratic objects.
+// The Quadratic Object defines and intersects with quadratic object_list.
 
 #pragma once
 

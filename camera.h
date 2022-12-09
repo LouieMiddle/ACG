@@ -30,8 +30,7 @@ public:
     Camera() = default;
 
     // Given an environment (typically the derived Scene class, fill in the framebuffer pixels, both colour and depth.
-    virtual void render(Environment &env, FrameBuffer &fb) {
-    }
+    virtual void render(Environment &env, FrameBuffer &fb) {}
 };
 
 #endif

@@ -44,7 +44,7 @@ Hit *Sphere::intersection(Ray ray) {
         return 0; // a negative value indicates no intersection.
     }
 
-    // an intersection has been found, record details in hit objects
+    // an intersection has been found, record details in hit object_list
 
     float ds = sqrtf(disc);
 

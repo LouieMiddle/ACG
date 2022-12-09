@@ -9,22 +9,30 @@
 #include "photon.h"
 #include "alglib/stdafx.h"
 #include "alglib/alglibmisc.h"
+#include "utils.h"
 
 using namespace std;
 using namespace alglib;
 
 class PhotonMap {
 public:
-    Object *objects;
-    Light *lights;
+    Object *object_list;
+    Light *light_list;
+
+    vector<Photon> photons;
+    vector<double> points;
+    vector<long long> tags;
+    kdtree tree;
 
     PhotonMap(Object *p_objects, Light *p_lights);
 
-    void build_kd_tree(vector<double> &points, kdtree &tree, vector<long long> &tags);
+    void emit_photons(int number_photons, int recurse);
 
-    void gather_photons(Vertex position, int neighbours, kdtree &tree, vector<Photon> &photons, vector<Photon *> &local_photons);
+    void trace_photon(Photon photon, int recurse);
 
-    Colour estimate_radiance(Hit &hit, const vector<Photon *>& local_photons);
+    void build_kd_tree();
 
-    void store_photon(Photon p, vector<double> &points, vector<Photon> &photons, vector<long long> &tags);
+    void gather_photons(Vertex position, int neighbours, vector<Photon *> &local_photons);
+
+    void store_photon(Photon photon);
 };

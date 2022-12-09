@@ -16,8 +16,8 @@
 * produced it.
 */
 
-/* CSG is an object that is built by Constructive Solid Geometry from two sub-objects.
- * It supports three operations Union, Intersection and Difference of the two sub-objects.
+/* CSG is an object that is built by Constructive Solid Geometry from two sub-object_list.
+ * It supports three operations Union, Intersection and Difference of the two sub-object_list.
  * */
 
 #pragma once

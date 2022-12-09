@@ -26,7 +26,7 @@ GlobalMaterial::GlobalMaterial(Environment *p_env, float p_ior, bool p_transmiss
     transmissive = p_transmissive;
 }
 
-// TODO: Cite scratch a pixel
+// With code inspired from https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel
 void GlobalMaterial::fresnel(float &kr, float cos_i) {
     float eta_i = 1.0f, eta_t = ior;
     // The ray starts in the medium that is not air so swap the refractive indexes
@@ -47,7 +47,9 @@ void GlobalMaterial::fresnel(float &kr, float cos_i) {
     }
 }
 
-// TODO: Cite scratch a pixel
+// TODO: Might want to move to utils and do the same for reflect ray method
+//  this is so it can be used for photon mapping
+// With code inspired from https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel
 void GlobalMaterial::refract_ray(Vector &view, Vector &normal, Vector &refract_ray, float cos_i) {
     float eta_i = 1.0f, eta_t = ior;
     Vector n = normal;

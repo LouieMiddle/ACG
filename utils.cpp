@@ -1,5 +1,6 @@
 #include "utils.h"
 
+// Mostly a copy of https://codeforgeek.com/sort-linked-lists-cpp/ as Hit lists are basically singly linked lists
 Hit *utils::merge_hits(Hit *head1, Hit *head2) {
     if (head1 == 0)
         return head2;
@@ -18,6 +19,7 @@ Hit *utils::merge_hits(Hit *head1, Hit *head2) {
     return temp;
 }
 
+// Mostly a copy of https://codeforgeek.com/sort-linked-lists-cpp/ as Hit lists are basically singly linked lists
 Hit *utils::mid_point_hits(Hit *head) {
     if (head == 0 || head->next == 0)
         return head;
@@ -38,6 +40,7 @@ Hit *utils::mid_point_hits(Hit *head) {
     return slow;
 }
 
+// Mostly a copy of https://codeforgeek.com/sort-linked-lists-cpp/ as Hit lists are basically singly linked lists
 Hit *utils::merge_sort_hits(Hit *head) {
     if (head == 0 || head->next == 0)
         return head;
@@ -56,6 +59,7 @@ Hit *utils::merge_sort_hits(Hit *head) {
     return c;
 }
 
+// Mostly a copy of https://www.geeksforgeeks.org/cpp-program-for-inserting-a-node-in-a-linked-list/ as Hit lists are basically singly linked lists
 void utils::append_hits(Hit **head_ref, Hit *new_data) {
     Hit *last = *head_ref;
 
@@ -116,3 +120,71 @@ Vector utils::get_random_direction_in_range(Vector direction, float theta) {
     return result;
 }
 
+Hit *utils::trace(Ray ray, Object *object_list) {
+    Hit *best_hit = 0;
+
+    Object *objects = object_list;
+
+    while (objects != 0) {
+        Hit *hit = utils::select_first(objects->intersection(ray));
+
+        if (hit != 0) {
+            if (best_hit == 0) {
+                best_hit = hit;
+            } else if (hit->t < best_hit->t) {
+                delete best_hit;
+                best_hit = hit;
+            } else {
+                delete hit;
+            }
+        }
+
+        objects = objects->next;
+    }
+
+    return best_hit;
+}
+
+bool utils::shadow_trace(Ray ray, Object *object_list, float limit) {
+    Object *objects = object_list;
+
+    while (objects != 0) {
+        Hit *hit = utils::select_first(objects->intersection(ray));
+
+        if (hit != 0) {
+            if ((hit->t > 0.00000001f) && (hit->t < limit)) {
+                delete hit;
+                return true;
+            }
+            delete hit;
+        }
+
+        objects = objects->next;
+    }
+
+    return false;
+}
+
+Hit *utils::select_first(Hit *list) {
+    Hit *result = 0;
+
+    while (list != 0) {
+        if (list->t >= 0.0f) {
+            result = list;
+            list = list->next;
+            break;
+        }
+
+        Hit *temp = list;
+        list = list->next;
+        delete temp;
+    }
+
+    while (list != 0) {
+        Hit *temp = list;
+        list = list->next;
+        delete temp;
+    }
+
+    return result;
+}

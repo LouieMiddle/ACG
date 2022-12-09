@@ -26,14 +26,14 @@
 #include "framebuffer.h"
 #include "scene.h"
 
-// classes that contain our objects to be rendered, all derived from Object
+// classes that contain our object_list to be rendered, all derived from Object
 #include "polymesh_object.h"
 #include "sphere_object.h"
 #include "plane_object.h"
 #include "quadratic_object.h"
 #include "csg_object.h"
 
-// classes that contain our lights, all derived from Light
+// classes that contain our light_list, all derived from Light
 #include "directional_light.h"
 #include "point_light.h"
 
@@ -230,10 +230,6 @@ void add_standard_ray_trace(Scene &scene) {
 void add_photon_mapping(Scene &scene) {
     add_cornell_box(scene, true);
 
-//    Sphere *sphere = new Sphere(Vertex(0.0f, 0.0f, 0.0f), 0.5f);
-//    sphere->set_material(yellow_pm);
-//    scene.add_object(sphere);
-
     // The following move_teapot allows 4D homogeneous coordinates to be transformed. It moves the supplied teapot model to somewhere visible.
     Transform *move_teapot = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
                                            0.0f, 0.0f, 1.0f, -2.0f,
@@ -246,12 +242,15 @@ void add_photon_mapping(Scene &scene) {
     teapot->set_material(yellow_pm);
     scene.add_object(teapot);
 
-    // After all objects and lights added generate photon map
-    scene.set_photon_map();
+    PhotonMap *photonMap = new PhotonMap(scene.object_list, scene.light_list);
+    photonMap->emit_photons(50000, 50);
+
+    // After all object_list and light_list added generate photon map
+    scene.set_photon_map(photonMap);
 }
 
 void build_scene(Scene &scene) {
-    // Always need lights
+    // Always need light_list
     add_lights(scene);
 
     // Standard ray tracing scene

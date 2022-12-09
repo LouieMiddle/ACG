@@ -4239,7 +4239,7 @@ This function initializes ae_lock structure.
 INPUT PARAMETERS:
     lock                -   pointer to lock structure, must be zero-filled
     state               -   pointer to state structure, used for exception
-                            handling and management of automatic objects.
+                            handling and management of automatic object_list.
     make_automatic      -   if true, lock object is added to automatic
                             memory management list.
 
@@ -4278,7 +4278,7 @@ critical exceptions and handled by calling abort().
 INPUT PARAMETERS:
     lock                -   pointer to lock structure, must be zero-filled
     state               -   pointer to state structure, used for exception
-                            handling and management of automatic objects;
+                            handling and management of automatic object_list;
                             non-NULL.
     make_automatic      -   if true, lock object is added to automatic
                             memory management list.
@@ -4391,7 +4391,7 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst)
         dst->seed_object = NULL;
     }
     
-    /* destroy recycled objects */
+    /* destroy recycled object_list */
     for(ptr=dst->recycled_objects; ptr!=NULL;)
     {
         tmp = (ae_shared_pool_entry*)ptr->next_entry;
@@ -4455,7 +4455,7 @@ void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, ae_bool m
         dst->init_copy(dst->seed_object, src->seed_object, state, ae_false);
     }
     
-    /* copy recycled objects */
+    /* copy recycled object_list */
     dst->recycled_objects = NULL;
     for(ptr=src->recycled_objects; ptr!=NULL; ptr=(ae_shared_pool_entry*)ptr->next_entry)
     {
@@ -4535,8 +4535,8 @@ ae_bool ae_shared_pool_is_initialized(void *_dst)
 
 
 /************************************************************************
-This function sets internal seed object. All objects owned by the pool
-(current seed object, recycled objects) are automatically freed.
+This function sets internal seed object. All object_list owned by the pool
+(current seed object, recycled object_list) are automatically freed.
 
 dst                 destination pool (initialized by constructor function)
 seed_object         new seed object
@@ -4561,7 +4561,7 @@ void ae_shared_pool_set_seed(
     /* state!=NULL, allocation errors result in exception */
     AE_CRITICAL_ASSERT(state!=NULL);
     
-    /* destroy internal objects */
+    /* destroy internal object_list */
     ae_shared_pool_internalclear(dst);
     
     /* set non-pointer fields */
@@ -4611,12 +4611,12 @@ void ae_shared_pool_retrieve(
     /* acquire lock */
     ae_acquire_lock(&pool->pool_lock);
     
-    /* try to reuse recycled objects */
+    /* try to reuse recycled object_list */
     if( pool->recycled_objects!=NULL )
     {
         ae_shared_pool_entry *result;
         
-        /* retrieve entry/object from list of recycled objects */
+        /* retrieve entry/object from list of recycled object_list */
         result = pool->recycled_objects;
         pool->recycled_objects = (ae_shared_pool_entry*)pool->recycled_objects->next_entry;
         new_obj = result->obj;
@@ -4705,7 +4705,7 @@ void ae_shared_pool_recycle(
         ae_acquire_lock(&pool->pool_lock);
     }
     
-    /* add object to the list of recycled objects */
+    /* add object to the list of recycled object_list */
     new_entry->obj = pptr->ptr;
     new_entry->next_entry = pool->recycled_objects;
     pool->recycled_objects = new_entry;
@@ -4719,7 +4719,7 @@ void ae_shared_pool_recycle(
 
 
 /************************************************************************
-This function clears internal list of  recycled  objects,  but  does  not
+This function clears internal list of  recycled  object_list,  but  does  not
 change seed object managed by the pool.
 
 pool                pool
@@ -4734,7 +4734,7 @@ void ae_shared_pool_clear_recycled(
 {
     ae_shared_pool_entry *ptr, *tmp;
     
-    /* clear recycled objects */
+    /* clear recycled object_list */
     for(ptr=pool->recycled_objects; ptr!=NULL;)
     {
         tmp = (ae_shared_pool_entry*)ptr->next_entry;
@@ -4758,8 +4758,8 @@ IMPORTANT:
 * target pointer DOES NOT become owner of the new value
 * this function IS NOT thread-safe
 * you SHOULD NOT modify shared pool during enumeration (although you  can
-  modify state of the objects retrieved from pool)
-* in case there is no recycled objects in the pool, NULL is stored to pptr
+  modify state of the object_list retrieved from pool)
+* in case there is no recycled object_list in the pool, NULL is stored to pptr
 * in case pool is not seeded, NULL is stored to pptr
 
 pool                pool
@@ -4797,8 +4797,8 @@ IMPORTANT:
 * target pointer DOES NOT become owner of the new value
 * this function IS NOT thread-safe
 * you SHOULD NOT modify shared pool during enumeration (although you  can
-  modify state of the objects retrieved from pool)
-* in case there is no recycled objects left in the pool, NULL is stored.
+  modify state of the object_list retrieved from pool)
+* in case there is no recycled object_list left in the pool, NULL is stored.
 * in case pool is not seeded, NULL is stored.
 
 pool                pool
@@ -4834,7 +4834,7 @@ void ae_shared_pool_next_recycled(
 
 
 /************************************************************************
-This function clears internal list of recycled objects and  seed  object.
+This function clears internal list of recycled object_list and  seed  object.
 However, pool still can be used (after initialization with another seed).
 
 pool                pool

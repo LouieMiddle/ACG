@@ -12,5 +12,5 @@ public:
 
     bool get_direction(Vertex &surface, Vector &dir, float &dist);
 
-    void get_intensity(Vertex &surface, Colour &intensity);
+    void get_intensity(Vertex &surface, Colour &p_intensity);
 };

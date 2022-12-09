@@ -20,10 +20,10 @@ bool PointLight::get_direction(Vertex &surface, Vector &dir, float &dist) {
     return true;
 }
 
-void PointLight::get_intensity(Vertex &surface, Colour &level) {
+void PointLight::get_intensity(Vertex &surface, Colour &p_intensity) {
 //    float r2 = (surface - position).len_sqr();
 //    level = intensity * (1 / (4 * (float) M_PI * r2));
 
     // Don't use inverse square law as effect is too strong
-    level = intensity;
+    p_intensity = intensity;
 }
