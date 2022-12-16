@@ -21,18 +21,20 @@ public:
 
     vector<Photon> photons;
     vector<double> points;
-    vector<long long> tags;
+    vector<long long> photon_indexes;
     kdtree tree;
 
     PhotonMap(Object *p_objects, Light *p_lights);
 
-    void emit_photons(int number_photons, int recurse);
+    void emit_photons(int number_photons, int recurse, PhotonMode mode);
 
-    void trace_photon(Photon photon, int recurse);
+    void trace_photon(Photon photon, int recurse, int number_photons);
+
+    void emit_shadow_photon(Photon photon);
 
     void build_kd_tree();
 
     void gather_photons(Vertex position, int neighbours, vector<Photon *> &local_photons);
 
-    void store_photon(Photon photon);
+    void store_photon(Photon photon, int number_photons);
 };

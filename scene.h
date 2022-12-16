@@ -58,5 +58,9 @@ public:
 
     void set_photon_map(PhotonMap *p_photon_map);
 
-    Colour estimate_radiance(Hit &hit, const vector<Photon *>& local_photons);
+    void set_caustic_photon_map(PhotonMap * p_caustic_photon_map);
+
+    bool in_shadow(int neighbours, const vector<Photon *>& local_photons);
+
+    Colour estimate_radiance(Ray &ray, Hit &hit, const vector<Photon *>& local_photons);
 };

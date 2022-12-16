@@ -90,7 +90,7 @@ Hit *CSG::filter_hits(Hit *hits) {
                 Hit *temp = hits;
                 hits = hits->next;
                 temp->next = 0;
-                utils::append_hits(&result, temp);
+                Utils::append_hits(&result, temp);
             }
         } else {
             Hit *temp = hits;
@@ -110,8 +110,8 @@ Hit *CSG::filter_hits(Hit *hits) {
 
 Hit *CSG::intersection(Ray ray) {
     Hit *hits = left->intersection(ray);
-    utils::append_hits(&hits, right->intersection(ray));
-    hits = utils::merge_sort_hits(hits);
+    Utils::append_hits(&hits, right->intersection(ray));
+    hits = Utils::merge_sort_hits(hits);
     return filter_hits(hits);
 }
 

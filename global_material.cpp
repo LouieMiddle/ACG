@@ -20,10 +20,11 @@
 
 #include <math.h>
 
-GlobalMaterial::GlobalMaterial(Environment *p_env, float p_ior, bool p_transmissive) {
+GlobalMaterial::GlobalMaterial(Environment *p_env, float p_ior, bool p_transmissive, float p_probability_transmissive) {
     environment = p_env;
     ior = p_ior;
     transmissive = p_transmissive;
+    probability_transmissive = p_probability_transmissive;
 }
 
 // With code inspired from https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel
@@ -47,25 +48,6 @@ void GlobalMaterial::fresnel(float &kr, float cos_i) {
     }
 }
 
-// TODO: Might want to move to utils and do the same for reflect ray method
-//  this is so it can be used for photon mapping
-// With code inspired from https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel
-void GlobalMaterial::refract_ray(Vector &view, Vector &normal, Vector &refract_ray, float cos_i) {
-    float eta_i = 1.0f, eta_t = ior;
-    Vector n = normal;
-    if (cos_i < 0.0f) {
-        cos_i = -cos_i;
-    } else {
-        // The ray starts in the medium that is not air so swap the refractive indexes and negate normal
-        swap(eta_i, eta_t);
-        n = -normal;
-    }
-
-    float eta = eta_i / eta_t;
-    float cos_t = sqrt(1.0f - (eta * eta) * (1.0f - cos_i * cos_i));
-    refract_ray = eta * view + (eta * cos_i - cos_t) * n;
-}
-
 // reflection and recursion computation
 Colour GlobalMaterial::compute_once(Ray &viewer, Hit &hit, int recurse) {
     Colour result = Colour(0.0f, 0.0f, 0.0f);
@@ -83,7 +65,7 @@ Colour GlobalMaterial::compute_once(Ray &viewer, Hit &hit, int recurse) {
             Ray refraction_ray;
             float refraction_depth;
             Colour refract_colour = Colour(0.0f, 0.0f, 0.0f);
-            refract_ray(viewer.direction, hit.normal, refraction_ray.direction, cos_i);
+            Utils::refract_ray(viewer.direction, hit.normal, refraction_ray.direction, ior);
             refraction_ray.direction.normalise();
             refraction_ray.position = outside ? hit.position - bias : hit.position + bias;
             environment->raytrace(refraction_ray, recurse - 1, refract_colour, refraction_depth);
@@ -93,18 +75,17 @@ Colour GlobalMaterial::compute_once(Ray &viewer, Hit &hit, int recurse) {
         Ray reflected_ray;
         float reflected_depth;
         Colour reflect_colour = Colour(0.0f, 0.0f, 0.0f);
-        reflected_ray.direction = viewer.direction - 2.0f * cos_i * hit.normal;
+        Utils::reflect_ray(viewer.direction, hit.normal, reflected_ray.direction);
         reflected_ray.direction.normalise();
         reflected_ray.position = outside ? hit.position + bias : hit.position - bias;
         environment->raytrace(reflected_ray, recurse - 1, reflect_colour, reflected_depth);
-
         result = transmissive ? result + reflect_colour * kr : result + reflect_colour * 0.8;
     }
 
     return result;
 }
 
-Colour GlobalMaterial::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
+Colour GlobalMaterial::compute_per_light(Vector &viewer, Hit &hit, Vector &l_dir) {
     Colour result;
 
     result.r = 0.0f;

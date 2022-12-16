@@ -5,7 +5,7 @@
 #include "ray.h";
 #include <random>
 
-class utils {
+class Utils {
 public:
     static Hit *merge_sort_hits(Hit *head);
     static Hit *merge_hits(Hit *head1, Hit *head2);
@@ -28,4 +28,8 @@ public:
 
     // Filter the list of returned hits to the closest +ve
     static Hit *select_first(Hit *list);
+
+    static void refract_ray(Vector &view, Vector &normal, Vector &refract_ray, float ior);
+
+    static void reflect_ray(Vector &view, Vector &normal, Vector &reflect_ray);
 };

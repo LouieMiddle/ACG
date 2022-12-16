@@ -25,49 +25,56 @@ Scene::Scene() {
 
 void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
     // first step, find the closest primitive
-    Hit *best_hit = utils::trace(ray, this->object_list);
+    Hit *best_hit = Utils::trace(ray, this->object_list);
 
     // if we found a primitive then compute the colour we should see
     if (best_hit != 0) {
-        int neighbours = 700;
+        int neighbours = 500;
         vector<Photon *> local_photons;
-        photon_map->gather_photons(best_hit->position, neighbours, local_photons);
+        if (this->photon_map != 0) {
+            this->photon_map->gather_photons(best_hit->position, neighbours, local_photons);
+            colour += this->estimate_radiance(ray, *best_hit, local_photons);
+
+            if (this->caustic_photon_map != 0) {
+                int caustic_neighbours = 100;
+                vector<Photon *> caustic_local_photons;
+                this->caustic_photon_map->gather_photons(best_hit->position, caustic_neighbours,  caustic_local_photons);
+                colour += this->estimate_radiance(ray, *best_hit, caustic_local_photons);
+            }
+        } else {
+            colour += best_hit->what->material->compute_once(ray, *best_hit,
+                                                             recurse);
+        }
 
         depth = best_hit->t;
-
-        colour = colour + best_hit->what->material->compute_once(ray, *best_hit,
-                                                                 recurse); // this will be the global components such as ambient or reflect/refract
-
-        // If there is no photon map or object_list using the photon mapping materials this will simply return nothing
-        colour = colour + this->estimate_radiance(*best_hit, local_photons);
 
         // next, compute the light contribution for each light in the scene.
         Light *light = light_list;
         while (light != (Light *) 0) {
             Vector viewer;
-            Vector ldir;
+            Vector l_dir;
 
             viewer = ray.position - best_hit->position;
             viewer.normalise();
 
             bool lit;
             float dist;
-            lit = light->get_direction(best_hit->position, ldir, dist);
+            lit = light->get_direction(best_hit->position, l_dir, dist);
 
-            if (ldir.dot(best_hit->normal) > 0) {
+            if (l_dir.dot(best_hit->normal) > 0) {
                 lit = false; //light is facing wrong way.
             }
 
             // Put the shadow check here, if lit==true and in shadow, set lit=false
 
-            if (lit) {
+            if (lit && in_shadow(neighbours, local_photons)) {
                 Ray shadow_ray;
 
-                shadow_ray.direction = -ldir;
+                shadow_ray.direction = -l_dir;
 
                 shadow_ray.position = best_hit->position + (0.0001f * shadow_ray.direction);
 
-                if (utils::shadow_trace(shadow_ray, this->object_list, dist)) {
+                if (Utils::shadow_trace(shadow_ray, this->object_list, dist)) {
                     lit = false; //there's a shadow so no lighting, if realistically close
                 }
             }
@@ -77,10 +84,13 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
 
                 light->get_intensity(best_hit->position, intensity);
 
-                colour = colour + intensity * best_hit->what->material->compute_per_light(viewer, *best_hit,
-                                                                                          ldir); // this is the per light local contrib e.g. diffuse, specular
+                if (this->photon_map != 0) {
+                    colour += colour * best_hit->what->material->compute_per_light(viewer, *best_hit, l_dir);
+                } else {
+                    colour += intensity * best_hit->what->material->compute_per_light(viewer, *best_hit,
+                                                                                              l_dir); // this is the per light local contrib e.g. diffuse, specular
+                }
             }
-
             light = light->next;
         }
 
@@ -93,34 +103,48 @@ void Scene::raytrace(Ray ray, int recurse, Colour &colour, float &depth) {
     }
 }
 
+bool Scene::in_shadow(int neighbours, const vector<Photon *> &local_photons) {
+    if (this->photon_map == 0) {
+        return true;
+    }
+
+    int counter = 0;
+    for (Photon *p : local_photons) {
+        if (p->mode == PHOTON_SHADOW)
+            counter++;
+    }
+    if (counter >= (neighbours / 2)) {
+        return true;
+    }
+//    return false;
+    // TODO: Currently getting segmentation faults with shadow photons, once working reset to return false
+    return true;
+}
+
 // estimate radiance for a given point
-Colour Scene::estimate_radiance(Hit &hit, const vector<Photon *> &local_photons) {
+Colour Scene::estimate_radiance(Ray &ray, Hit &hit, const vector<Photon *> &local_photons) {
     Colour radiance = Colour(0.0f, 0.0f, 0.0f);
     float max_dist;
-    for (Photon *p: local_photons) {
-        float dist = (p->path.position - hit.position).length();
+    for (Photon *photon: local_photons) {
+        float dist = (photon->path.position - hit.position).length();
         if (dist > max_dist)
             max_dist = dist;
     }
 
-    for (Photon *p: local_photons) {
-        float dist = (p->path.position - hit.position).len_sqr();
-
-        radiance += hit.what->material->compute_ambient();
+    for (Photon *photon: local_photons) {
+        float dist = (photon->path.position - hit.position).length();
 
         // gaussian filtering
         float alpha = 0.918;
         float beta = 1.953;
         float gaussian = alpha * (1 - (1 - exp(-beta * ((dist * dist) / (2 * max_dist * max_dist)))) / (1 - exp(-beta)));
 
-        radiance += p->intensity * hit.what->material->compute_diffuse(hit, p->path.direction) * gaussian;
+        radiance += photon->intensity * (hit.what->material->compute_once(ray, hit, 1) + hit.what->material->compute_per_light(ray.direction, hit, photon->path.direction)) * gaussian;
     }
     // scale by area sampled
     radiance = radiance * (1 / ((float) M_PI * max_dist * max_dist));
     return radiance;
 }
-
-
 
 void Scene::add_object(Object *obj) {
     obj->next = this->object_list;
@@ -134,4 +158,8 @@ void Scene::add_light(Light *light) {
 
 void Scene::set_photon_map(PhotonMap *p_photon_map) {
     photon_map = p_photon_map;
+}
+
+void Scene::set_caustic_photon_map(PhotonMap *p_caustic_photon_map) {
+    caustic_photon_map = p_caustic_photon_map;
 }

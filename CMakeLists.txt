@@ -44,4 +44,4 @@ add_executable(
         alglib/alglibinternal.h alglib/alglibinternal.cpp
         alglib/alglibmisc.h alglib/alglibmisc.cpp
         alglib/ap.h alglib/ap.cpp
-        phong_material_photon_mapping.cpp phong_material_photon_mapping.h utils.cpp utils.h)
+        utils.cpp utils.h)

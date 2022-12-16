@@ -163,7 +163,7 @@ PolyMesh::PolyMesh(char *file, bool smooth) {
 
 // Using Jack Ritter Algorithm
 void PolyMesh::calculate_bounding_sphere() {
-    float min_x, max_x, min_y, max_y, min_z, max_z;
+    float min_x = 0.0f, max_x = 0.0f, min_y = 0.0f, max_y = 0.0f, min_z = 0.0f, max_z = 0.0f;
     
     for(int i = 0; i < vertex_count; i++) {
         if(vertex[i].x < min_x) min_x = vertex[i].x;

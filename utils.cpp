@@ -1,7 +1,7 @@
 #include "utils.h"
 
 // Mostly a copy of https://codeforgeek.com/sort-linked-lists-cpp/ as Hit lists are basically singly linked lists
-Hit *utils::merge_hits(Hit *head1, Hit *head2) {
+Hit *Utils::merge_hits(Hit *head1, Hit *head2) {
     if (head1 == 0)
         return head2;
     if (head2 == 0)
@@ -20,7 +20,7 @@ Hit *utils::merge_hits(Hit *head1, Hit *head2) {
 }
 
 // Mostly a copy of https://codeforgeek.com/sort-linked-lists-cpp/ as Hit lists are basically singly linked lists
-Hit *utils::mid_point_hits(Hit *head) {
+Hit *Utils::mid_point_hits(Hit *head) {
     if (head == 0 || head->next == 0)
         return head;
 
@@ -41,7 +41,7 @@ Hit *utils::mid_point_hits(Hit *head) {
 }
 
 // Mostly a copy of https://codeforgeek.com/sort-linked-lists-cpp/ as Hit lists are basically singly linked lists
-Hit *utils::merge_sort_hits(Hit *head) {
+Hit *Utils::merge_sort_hits(Hit *head) {
     if (head == 0 || head->next == 0)
         return head;
 
@@ -60,7 +60,7 @@ Hit *utils::merge_sort_hits(Hit *head) {
 }
 
 // Mostly a copy of https://www.geeksforgeeks.org/cpp-program-for-inserting-a-node-in-a-linked-list/ as Hit lists are basically singly linked lists
-void utils::append_hits(Hit **head_ref, Hit *new_data) {
+void Utils::append_hits(Hit **head_ref, Hit *new_data) {
     Hit *last = *head_ref;
 
     if (*head_ref == 0) {
@@ -74,7 +74,7 @@ void utils::append_hits(Hit **head_ref, Hit *new_data) {
     last->next = new_data;
 }
 
-float utils::get_random_number(float min, float max) {
+float Utils::get_random_number(float min, float max) {
     random_device device;
     mt19937 random(device());
     uniform_real_distribution<> distribution(min, max);
@@ -82,7 +82,7 @@ float utils::get_random_number(float min, float max) {
     return n;
 }
 
-Vector utils::get_random_direction() {
+Vector Utils::get_random_direction() {
     float x = get_random_number(-1.0f, 1.0f);
     float y = get_random_number(-1.0f, 1.0f);
     float z = get_random_number(-1.0f, 1.0f);
@@ -94,7 +94,7 @@ Vector utils::get_random_direction() {
 }
 
 // generate random direction in direction within range defined by theta
-Vector utils::get_random_direction_in_range(Vector direction, float theta) {
+Vector Utils::get_random_direction_in_range(Vector direction, float theta) {
     Vector basis_z = direction;
     basis_z.normalise();
 
@@ -107,10 +107,10 @@ Vector utils::get_random_direction_in_range(Vector direction, float theta) {
     basis_x.cross(basis_z, basis_y);
 
     // height
-    float z = utils::get_random_number(cos(theta), 1);
+    float z = Utils::get_random_number(cos(theta), 1);
 
     // rotation
-    float phi = utils::get_random_number(-M_PI, +M_PI);
+    float phi = Utils::get_random_number(-M_PI, +M_PI);
     float x = sqrt(1 - z * z) * cos(phi);
     float y = sqrt(1 - z * z) * sin(phi);
 
@@ -120,13 +120,13 @@ Vector utils::get_random_direction_in_range(Vector direction, float theta) {
     return result;
 }
 
-Hit *utils::trace(Ray ray, Object *object_list) {
+Hit *Utils::trace(Ray ray, Object *object_list) {
     Hit *best_hit = 0;
 
     Object *objects = object_list;
 
     while (objects != 0) {
-        Hit *hit = utils::select_first(objects->intersection(ray));
+        Hit *hit = Utils::select_first(objects->intersection(ray));
 
         if (hit != 0) {
             if (best_hit == 0) {
@@ -145,11 +145,11 @@ Hit *utils::trace(Ray ray, Object *object_list) {
     return best_hit;
 }
 
-bool utils::shadow_trace(Ray ray, Object *object_list, float limit) {
+bool Utils::shadow_trace(Ray ray, Object *object_list, float limit) {
     Object *objects = object_list;
 
     while (objects != 0) {
-        Hit *hit = utils::select_first(objects->intersection(ray));
+        Hit *hit = Utils::select_first(objects->intersection(ray));
 
         if (hit != 0) {
             if ((hit->t > 0.00000001f) && (hit->t < limit)) {
@@ -165,7 +165,7 @@ bool utils::shadow_trace(Ray ray, Object *object_list, float limit) {
     return false;
 }
 
-Hit *utils::select_first(Hit *list) {
+Hit *Utils::select_first(Hit *list) {
     Hit *result = 0;
 
     while (list != 0) {
@@ -187,4 +187,29 @@ Hit *utils::select_first(Hit *list) {
     }
 
     return result;
+}
+
+// With code inspired from https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel
+void Utils::refract_ray(Vector &view, Vector &normal, Vector &refract_ray, float ior) {
+    float cos_i = view.dot(normal);
+
+    float eta_i = 1.0f, eta_t = ior;
+    Vector n = normal;
+    if (cos_i < 0.0f) {
+        cos_i = -cos_i;
+    } else {
+        // The ray starts in the medium that is not air so swap the refractive indexes and negate normal
+        swap(eta_i, eta_t);
+        n = -normal;
+    }
+
+    float eta = eta_i / eta_t;
+    float cos_t = sqrt(1.0f - (eta * eta) * (1.0f - cos_i * cos_i));
+    refract_ray = eta * view + (eta * cos_i - cos_t) * n;
+}
+
+void Utils::reflect_ray(Vector &view, Vector &normal, Vector &reflect_ray) {
+    float cos_i = view.dot(normal);
+
+    reflect_ray = view - 2.0f * cos_i * normal;
 }

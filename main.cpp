@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <string>
+#include <cfloat>
 
 // these are core raytracing classes
 #include "framebuffer.h"
@@ -47,28 +48,16 @@
 #include "simple_camera.h"
 #include "full_camera.h"
 
-// classes for photon mapping
-#include "phong_material_photon_mapping.h"
-
 using namespace std;
 
 // Standard phong colours
-Phong *white = new Phong(Colour(0.2f, 0.2f, 0.2f), Colour(0.4f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-Phong *red = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-Phong *green = new Phong(Colour(0.0f, 0.2f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-Phong *blue = new Phong(Colour(0.0f, 0.0f, 0.2f), Colour(0.0f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-Phong *yellow = new Phong(Colour(0.2f, 0.2f, 0.0f), Colour(0.4f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-Phong *purple = new Phong(Colour(0.2f, 0.0f, 0.2f), Colour(0.4f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-Phong *light_blue = new Phong(Colour(0.0f, 0.2f, 0.2f), Colour(0.0f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f);
-
-// Phong colours for photon mapping
-PhongPhotonMapping *white_pm = new PhongPhotonMapping(Colour(0.2f, 0.2f, 0.2f), Colour(0.4f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f,0.6f,0.0f);
-PhongPhotonMapping *red_pm = new PhongPhotonMapping(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
-PhongPhotonMapping *green_pm = new PhongPhotonMapping(Colour(0.0f, 0.2f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
-PhongPhotonMapping *blue_pm = new PhongPhotonMapping(Colour(0.0f, 0.0f, 0.2f), Colour(0.0f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
-PhongPhotonMapping *yellow_pm = new PhongPhotonMapping(Colour(0.2f, 0.2f, 0.0f), Colour(0.4f, 0.4f, 0.0f),Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
-PhongPhotonMapping *purple_pm = new PhongPhotonMapping(Colour(0.2f, 0.0f, 0.2f), Colour(0.4f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
-PhongPhotonMapping *light_blue_pm = new PhongPhotonMapping(Colour(0.0f, 0.2f, 0.2f), Colour(0.0f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f),40.f,0.6f,0.0f);
+Phong *white = new Phong(Colour(0.2f, 0.2f, 0.2f), Colour(0.4f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f, 0.6f);
+Phong *red = new Phong(Colour(0.2f, 0.0f, 0.0f), Colour(0.4f, 0.0f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f, 0.6f);
+Phong *green = new Phong(Colour(0.0f, 0.2f, 0.0f), Colour(0.0f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f, 0.6f);
+Phong *blue = new Phong(Colour(0.0f, 0.0f, 0.2f), Colour(0.0f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f, 0.6f);
+Phong *yellow = new Phong(Colour(0.2f, 0.2f, 0.0f), Colour(0.4f, 0.4f, 0.0f), Colour(0.4f, 0.4f, 0.4f), 40.f, 0.6f);
+Phong *purple = new Phong(Colour(0.2f, 0.0f, 0.2f), Colour(0.4f, 0.0f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f, 0.6f);
+Phong *light_blue = new Phong(Colour(0.0f, 0.2f, 0.2f), Colour(0.0f, 0.4f, 0.4f), Colour(0.4f, 0.4f, 0.4f), 40.f, 0.6f);
 
 Transform *rotate_90 = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
                                      0.0f, 0.0f, 1.0f, 0.0f,
@@ -83,34 +72,26 @@ Transform *rotate_180 = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
 
 void add_lights(Scene &scene) {
     DirectionalLight *dl = new DirectionalLight(Vector(1.0f, -1.0f, 1.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
-    PointLight *top_light = new PointLight(Vertex(-1.2f, 1.0f, 3.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
-    PointLight *bottom_light = new PointLight(Vertex(1.2f, -1.0f, 3.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
+    PointLight *top_light = new PointLight(Vertex(-5.0f, 4.0f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
+    PointLight *bottom_light = new PointLight(Vertex(5.0f, -4.0f, 0.0f), Colour(1.0f, 1.0f, 1.0f, 0.0f));
 
 //    scene.add_light(dl);
     scene.add_light(top_light);
     scene.add_light(bottom_light);
 }
 
-void add_cornell_box(Scene &scene, bool photon_map) {
-    Plane *back_white_plane = new Plane(0.0f, 0.0f, 1.0f, -10.0f);
-    Plane *top_blue_plane = new Plane(0.0f, 1.0f, 0.0f, -2.0f);
-    Plane *bottom_white_plane = new Plane(0.0f, 1.0f, 0.0f, 2.5f);
-    Plane *right_green_plane = new Plane(1.0f, 0.0f, 0.0f, -3.5f);
-    Plane *left_red_plane = new Plane(1.0f, 0.0f, 0.0f, 3.5f);
+void add_cornell_box(Scene &scene) {
+    Plane *back_white_plane = new Plane(0.0f, 0.0f, 1.0f, -14.0f);
+    Plane *top_blue_plane = new Plane(0.0f, 1.0f, 0.0f, -14.0f);
+    Plane *bottom_white_plane = new Plane(0.0f, 1.0f, 0.0f, 14.0f);
+    Plane *right_green_plane = new Plane(1.0f, 0.0f, 0.0f, -14.0f);
+    Plane *left_red_plane = new Plane(1.0f, 0.0f, 0.0f, 14.0f);
 
-    if (!photon_map) {
-        back_white_plane->set_material(white);
-        top_blue_plane->set_material(blue);
-        bottom_white_plane->set_material(white);
-        right_green_plane->set_material(green);
-        left_red_plane->set_material(red);
-    } else {
-        back_white_plane->set_material(white_pm);
-        top_blue_plane->set_material(blue_pm);
-        bottom_white_plane->set_material(white_pm);
-        right_green_plane->set_material(green_pm);
-        left_red_plane->set_material(red_pm);
-    }
+    back_white_plane->set_material(white);
+    top_blue_plane->set_material(blue);
+    bottom_white_plane->set_material(white);
+    right_green_plane->set_material(green);
+    left_red_plane->set_material(red);
 
     scene.add_object(back_white_plane);
     scene.add_object(top_blue_plane);
@@ -125,8 +106,8 @@ void add_reflective_refractive(Scene &scene) {
     Sphere *reflective_sphere = new Sphere(Vertex(0.5f, 0.0f, 0.0f), 0.3f);
     Sphere *reflective_sphere2 = new Sphere(Vertex(-0.5f, 0.0f, 0.0f), 0.3f);
 
-    GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f, true);
-    GlobalMaterial *reflective_glass = new GlobalMaterial(&scene, 1.52f, false);
+    GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f, true, 0.99f);
+    GlobalMaterial *reflective_glass = new GlobalMaterial(&scene, 1.52f, false, 0.0f);
 
     CompoundMaterial *reflective_white_glass = new CompoundMaterial(2);
     reflective_white_glass->include_material(white);
@@ -149,9 +130,12 @@ void add_reflective_refractive(Scene &scene) {
 }
 
 void add_quadratic_surfaces(Scene &scene) {
-    Quadratic *quadratic_sphere = new Quadratic(2.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 5.0f, 0.0f, -1.0f);
-    Quadratic *quadratic_hyperboloid = new Quadratic(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f);
-    Quadratic *quadratic_cone = new Quadratic(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f);
+    Quadratic *quadratic_sphere = new Quadratic(2.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 5.0f, 0.0f, -1.0f,
+                                                FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX);
+    Quadratic *quadratic_hyperboloid = new Quadratic(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f,
+                                                     FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX);
+    Quadratic *quadratic_cone = new Quadratic(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+                                              FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX);
 
     quadratic_hyperboloid->apply_transform(*rotate_90);
     quadratic_cone->apply_transform(*rotate_90);
@@ -207,7 +191,25 @@ void add_csg(Scene &scene) {
     scene.add_object(combine_both);
 }
 
-void add_standard_ray_trace(Scene &scene) {
+void add_refractive_sphere(Scene &scene) {
+    Sphere *refractive_sphere = new Sphere(Vertex(2.0f, 2.0f, 5.0f), 1.0f);
+    GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f, true, 0.99f);
+    refractive_sphere->set_material(refractive_glass);
+    scene.add_object(refractive_sphere);
+}
+
+void add_reflective_sphere(Scene &scene) {
+    Sphere *reflective_sphere = new Sphere(Vertex(-2.0f, 2.0f, 5.0f), 1.0f);
+    GlobalMaterial *reflective_glass = new GlobalMaterial(&scene, 1.52f, false, 0.0f);
+    reflective_sphere->set_material(reflective_glass);
+    scene.add_object(reflective_sphere);
+}
+
+void build_scene(Scene &scene) {
+    add_lights(scene);
+
+    add_cornell_box(scene);
+
     // The following move_teapot allows 4D homogeneous coordinates to be transformed. It moves the supplied teapot model to somewhere visible.
     Transform *move_teapot = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
                                            0.0f, 0.0f, 1.0f, -2.0f,
@@ -220,50 +222,94 @@ void add_standard_ray_trace(Scene &scene) {
     teapot->set_material(yellow);
     scene.add_object(teapot);
 
-    // For standard ray tracing
-    add_cornell_box(scene, false);
-//    add_reflective_refractive(scene);
-//    add_quadratic_surfaces(scene);
-//    add_csg(scene);
+    // Add a refractive sphere to test caustics
+    add_refractive_sphere(scene);
+
+    add_reflective_sphere(scene);
+
+    // After all objects and lights added generate photon maps
+//    PhotonMap *photon_map = new PhotonMap(scene.object_list, scene.light_list);
+//    photon_map->emit_photons(150000, 50, PHOTON_NORMAL);
+//    cout << "Finished building photon map \n";
+
+//    PhotonMap *caustic_photon_map = new PhotonMap(scene.object_list, scene.light_list);
+//    caustic_photon_map->emit_photons(10000, 50, PHOTON_CAUSTIC);
+//    cout << "Finished building caustic photon map \n";
+
+//    scene.set_photon_map(photon_map);
+//    scene.set_caustic_photon_map(caustic_photon_map);
+
+    // For standard raytrace comment above and set photon maps to null
+    scene.set_photon_map(0);
+    scene.set_caustic_photon_map(0);
 }
 
-void add_photon_mapping(Scene &scene) {
-    add_cornell_box(scene, true);
+void build_final_image(Scene &scene) {
+    add_lights(scene);
+
+    add_cornell_box(scene);
 
     // The following move_teapot allows 4D homogeneous coordinates to be transformed. It moves the supplied teapot model to somewhere visible.
     Transform *move_teapot = new Transform(1.0f, 0.0f, 0.0f, 0.0f,
                                            0.0f, 0.0f, 1.0f, -2.0f,
-                                           0.0f, 1.0f, 0.0f, 5.0f,
+                                           0.0f, 1.0f, 0.0f, 1.0f,
                                            0.0f, 0.0f, 0.0f, 1.0f);
 
     //  Read in the teapot model.
     PolyMesh *teapot = new PolyMesh("teapot_smaller.ply", true);
     teapot->apply_transform(*move_teapot);
-    teapot->set_material(yellow_pm);
+    teapot->set_material(yellow);
     scene.add_object(teapot);
 
-    PhotonMap *photonMap = new PhotonMap(scene.object_list, scene.light_list);
-    photonMap->emit_photons(50000, 50);
+    Sphere *red_sphere = new Sphere(Vertex(-2.0f, 4.0f, 2.0f), 1.5f);
+    Sphere *blue_sphere = new Sphere(Vertex(0.0f, 4.0f, 2.0f), 1.5f);
+    Sphere *green_sphere = new Sphere(Vertex(2.0f, 4.0f, 2.0f), 1.5f);
 
-    // After all object_list and light_list added generate photon map
-    scene.set_photon_map(photonMap);
-}
+    blue_sphere->set_material(blue);
+    red_sphere->set_material(red);
+    green_sphere->set_material(green);
 
-void build_scene(Scene &scene) {
-    // Always need light_list
-    add_lights(scene);
+    CSG *blue_diff_red = new CSG(CSG_DIFF, blue_sphere, red_sphere);
+    CSG *blue_diff_red_diff_green = new CSG(CSG_DIFF, blue_diff_red, green_sphere);
 
-    // Standard ray tracing scene
-//    add_standard_ray_trace(scene);
+    Sphere *yellow_sphere = new Sphere(Vertex(-2.0f, 6.0f, 2.0f), 1.5f);
+    Sphere *purple_sphere = new Sphere(Vertex(0.0f, 6.0f, 2.0f), 1.5f);
+    Sphere *light_blue_sphere = new Sphere(Vertex(2.0f, 6.0f, 2.0f), 1.5f);
 
-    // If using photon mapping use below method
-    add_photon_mapping(scene);
+    yellow_sphere->set_material(yellow);
+    purple_sphere->set_material(purple);
+    light_blue_sphere->set_material(light_blue);
+
+    CSG *yellow_inter_purple = new CSG(CSG_INTER, yellow_sphere, purple_sphere);
+    CSG *light_blue_inter_purple = new CSG(CSG_INTER, light_blue_sphere, purple_sphere);
+    CSG *union_above = new CSG(CSG_UNION, yellow_inter_purple, light_blue_inter_purple);
+
+    CSG *combine_both = new CSG(CSG_UNION, union_above, blue_diff_red_diff_green);
+    scene.add_object(combine_both);
+
+    Sphere *refractive_sphere = new Sphere(Vertex(4.0f, -4.0f, 5.0f), 2.0f);
+    GlobalMaterial *refractive_glass = new GlobalMaterial(&scene, 1.52f, true, 0.99f);
+    refractive_sphere->set_material(refractive_glass);
+    scene.add_object(refractive_sphere);
+
+    Sphere *reflective_sphere = new Sphere(Vertex(-4.0f, -4.0f, 5.0f), 2.0f);
+    GlobalMaterial *reflective_glass = new GlobalMaterial(&scene, 1.52f, false, 0.0f);
+    reflective_sphere->set_material(reflective_glass);
+    scene.add_object(reflective_sphere);
+
+//    PhotonMap *photon_map = new PhotonMap(scene.object_list, scene.light_list);
+//    photon_map->emit_photons(2000000, 50, PHOTON_NORMAL);
+//    cout << "Finished building photon map \n";
+
+    scene.set_photon_map(0);
+
+    scene.set_caustic_photon_map(0);
 }
 
 // This is the entry point function to the program.
 int main(int argc, char *argv[]) {
-    int width = 512;
-    int height = 512;
+    int width = 1024;
+    int height = 1024;
     // Create a framebuffer
     FrameBuffer *fb = new FrameBuffer(width, height);
 
@@ -271,16 +317,23 @@ int main(int argc, char *argv[]) {
     Scene scene;
 
     // Setup the scene
-    build_scene(scene);
+    build_final_image(scene);
 
     // Declare a camera
-    Vertex position = *new Vertex(0.0f, 0.0f, 1.0f);
+    Vertex position = *new Vertex(0.0f, 0.0f, -6.0f);
     Vector look_at = *new Vector(0.0f, 0.0f, 1.0f);
     Vector up = *new Vector(0.0f, 1.0f, 0.0f);
     Camera *camera = new FullCamera(0.5f, position, look_at, up);
 
+    clock_t start;
+    double time;
+    start = clock();
+
     // Camera generates rays for each pixel in the framebuffer and records colour + depth.
     camera->render(scene, *fb);
+
+    time = (clock() - start) / ((double) CLOCKS_PER_SEC);
+    cout << "\ntime to render " << time << "\n";
 
     // Output the framebuffer colour and depth as two images
     fb->writeRGBFile((char *) "test.ppm");

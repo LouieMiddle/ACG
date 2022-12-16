@@ -21,23 +21,20 @@
 
 #include "material.h"
 #include "environment.h"
+#include "utils.h"
 
 using namespace std;
 
 class GlobalMaterial : public Material {
 public:
-    float ior;
-    bool transmissive;
     Environment *environment;
 
-    GlobalMaterial(Environment *p_env, float ior, bool transmissive);
+    GlobalMaterial(Environment *p_env, float ior, bool transmissive, float p_probability_transmissive);
 
     void fresnel(float &kr, float cos_i);
 
-    void refract_ray(Vector &view, Vector &normal, Vector &refract_ray, float cos_i);
-
     Colour compute_once(Ray &viewer, Hit &hit, int recurse);
 
-    Colour compute_per_light(Vector &viewer, Hit &hit, Vector &ldir);
+    Colour compute_per_light(Vector &viewer, Hit &hit, Vector &l_dir);
 };
 
