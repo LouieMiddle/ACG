@@ -38,15 +38,6 @@ FullCamera::FullCamera(float f, Vertex &p_position, Vector &p_lookat, Vector &p_
     lookat.normalise();
 }
 
-void FullCamera::get_ray_offset(int p_x, int p_y, float p_ox, float p_oy, Ray &p_ray) {
-    float fx = (p_ox + (float) p_x + 0.5f) / (float) width;
-    float fy = (p_oy + (float) p_y + 0.5f) / (float) height;
-
-    p_ray.position = position;
-    p_ray.direction = ((fx - 0.5f) * right) + ((0.5f - fy) * up) + (fov * lookat);
-    p_ray.direction.normalise();
-}
-
 void FullCamera::get_ray_pixel(int p_x, int p_y, Ray &ray) {
     float fx = ((float) p_x + 0.5f) / (float) width;
     float fy = ((float) p_y + 0.5f) / (float) height;

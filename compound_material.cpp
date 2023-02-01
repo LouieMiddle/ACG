@@ -51,13 +51,13 @@ Colour CompoundMaterial::compute_once(Ray &viewer, Hit &hit, int recurse) {
 }
 
 // The compute_per_light() method supplies the diffuse and specular terms.
-Colour CompoundMaterial::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
+Colour CompoundMaterial::compute_per_light(Vector &viewer, Hit &hit, Vector &l_dir) {
     Colour result;
 
     for (int i = 0; i < number; i += 1) {
         if (materials[i] == 0) return result;
 
-        result += materials[i]->compute_per_light(viewer, hit, ldir);
+        result += materials[i]->compute_per_light(viewer, hit, l_dir);
     }
 
     return result;

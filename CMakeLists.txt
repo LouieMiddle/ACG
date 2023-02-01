@@ -38,5 +38,10 @@ add_executable(
         global_material.h global_material.cpp
         quadratic_object.h quadratic_object.cpp
         csg_object.h csg_object.cpp
-        photon.h
-        point_light.h point_light.cpp)
+        photon.h photon.cpp
+        point_light.h point_light.cpp
+        photon_map.h photon_map.cpp
+        alglib/alglibinternal.h alglib/alglibinternal.cpp
+        alglib/alglibmisc.h alglib/alglibmisc.cpp
+        alglib/ap.h alglib/ap.cpp
+        utils.cpp utils.h)

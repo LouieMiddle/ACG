@@ -33,9 +33,4 @@ public:
         colour.b = 0.0f;
         depth = 100000000.0f;
     }
-
-    // raytrace a shadow ray. returns true if intersection found between 0 and limit along ray.
-    virtual bool shadowtrace(Ray, float limit) {
-        return false;
-    }
 };

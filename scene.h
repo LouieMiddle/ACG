@@ -24,32 +24,43 @@
 #include "light.h"
 #include "hit.h"
 #include "environment.h"
+#include "photon.h"
+#include "alglib/stdafx.h"
+#include "alglib/alglibmisc.h"
+#include "photon_map.h"
+#include "utils.h"
 
-// Scene is a class that is used to build a scene database of objects
-// and lights and then trace a ray through it.
+// Scene is a class that is used to build a scene database of object_list
+// and light_list and then trace a ray through it.
+
+using namespace alglib;
 
 class Scene : public Environment {
 public:
     Object *object_list;
     Light *light_list;
 
+    // Photon map for normal and shadow photons
+    PhotonMap *photon_map;
+
+    // Second photon map for caustics as described by Jensen
+    PhotonMap *caustic_photon_map;
+
     Scene();
-
-    // Filter the list of returned hits to the closest +ve
-    Hit *select_first(Hit *list);
-
-    // Trace a ray through the scene and find the closest if any object
-    // intersection in front of the ray.
-    Hit *trace(Ray ray);
 
     // Trace a ray through the scene and return its colour. This function
     // is the one that should recurse down the reflection/refraction tree within a material
     void raytrace(Ray ray, int recurse, Colour &colour, float &depth);
 
-    // raytrace a shadow ray.
-    bool shadowtrace(Ray, float limit);
-
     void add_object(Object *obj);
 
     void add_light(Light *light);
+
+    void set_photon_map(PhotonMap *p_photon_map);
+
+    void set_caustic_photon_map(PhotonMap * p_caustic_photon_map);
+
+    bool in_shadow(int neighbours, const vector<Photon *>& local_photons);
+
+    Colour estimate_radiance(Ray &ray, Hit &hit, const vector<Photon *>& local_photons);
 };

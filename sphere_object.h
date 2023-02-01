@@ -23,10 +23,8 @@
 #include "object.h"
 
 class Sphere : public Object {
-    Vertex center;
-    float radius;
 public:
-    Sphere(Vertex c, float r);
+    Sphere(Vertex p_centre, float p_radius);
 
     Hit *intersection(Ray ray);
 

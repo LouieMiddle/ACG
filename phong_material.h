@@ -19,11 +19,11 @@ public:
     Colour specular;
     float power;
 
-    Phong(Colour p_ambient, Colour p_diffuse, Colour p_specular, float p_power);
+    Phong(Colour p_ambient, Colour p_diffuse, Colour p_specular, float p_power, float p_probability_diffuse);
 
     Phong() = default;
 
     Colour compute_once(Ray &viewer, Hit &hit, int recurse);
 
-    Colour compute_per_light(Vector &viewer, Hit &hit, Vector &ldir);
+    Colour compute_per_light(Vector &viewer, Hit &hit, Vector &l_dir);
 };

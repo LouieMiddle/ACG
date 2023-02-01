@@ -40,7 +40,7 @@
 //  // Create a framebuffer
 //  FrameBuffer *fb = new FrameBuffer(512,512);
 //
-//  // Generate 64 radial lines around the center of the image.
+//  // Generate 64 radial lines around the centre of the image.
 //  for (float i = 0; i < M_PI * 2; i += M_PI / 32.0f)
 //  {
 //    // Generate a simple 2D vector

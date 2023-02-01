@@ -123,7 +123,7 @@ int FrameBuffer::writeRGBFile(char *filename) {
     outfile << this->width << " " << this->height << "\n255\n";
 
     for (int j = 0; j < this->width * this->height; j += 1) {
-        outfile << (unsigned char) (((this->framebuffer[j].red - min) / diff) * 255.0);
+        outfile << (unsigned char) (((this->framebuffer[j].red) / diff) * 255.0);
         outfile << (unsigned char) (((this->framebuffer[j].green) / diff) * 255.0);
         outfile << (unsigned char) (((this->framebuffer[j].blue) / diff) * 255.0);
     }

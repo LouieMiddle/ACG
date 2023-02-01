@@ -36,6 +36,6 @@ bool DirectionalLight::get_direction(Vertex &surface, Vector &dir, float &dist) 
     return true;
 }
 
-void DirectionalLight::get_intensity(Vertex &surface, Colour &level) {
-    level = intensity;
+void DirectionalLight::get_intensity(Vertex &surface, Colour &p_intensity) {
+    p_intensity = intensity;
 }

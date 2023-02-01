@@ -21,6 +21,9 @@
 #pragma once
 
 #include "object.h"
+#include "sphere_object.h"
+
+using namespace std;
 
 typedef int TriangleIndex[3];
 
@@ -34,6 +37,8 @@ public:
     TriangleIndex *triangle;
     bool smoothing;
 
+    Sphere *bounding_sphere;
+
     Hit *triangle_intersection(Ray ray, int which_triangle);
 
     void compute_face_normal(int which_triangle, Vector &normal);
@@ -45,6 +50,8 @@ public:
     Hit *intersection(Ray ray);
 
     void apply_transform(Transform &trans);
+
+    void calculate_bounding_sphere();
 
     PolyMesh(char *file, bool smooth);
 

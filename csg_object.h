@@ -16,15 +16,16 @@
 * produced it.
 */
 
-/* CSG is an object that is built by Constructive Solid Geometry from two sub-objects.
- * It supports three operations Union, Intersection and Difference of the two sub-objects.
+/* CSG is an object that is built by Constructive Solid Geometry from two sub-object_list.
+ * It supports three operations Union, Intersection and Difference of the two sub-object_list.
  * */
 
 #pragma once
 
 #include "object.h"
+#include "utils.h"
 
-enum Mode {
+enum CSGMode {
     CSG_UNION = 0,
     CSG_INTER = 1,
     CSG_DIFF = 2
@@ -33,9 +34,12 @@ enum Mode {
 static const char *CSG_TYPE = "3CSG";
 
 class CSG : public Object {
-    Mode mode;
+    CSGMode mode;
 public:
-    CSG(Mode p_mode, Object *p_left, Object *p_right);
+    Object *left;
+    Object *right;
+
+    CSG(CSGMode p_mode, Object *p_left, Object *p_right);
 
     bool operation_allowed(bool lhit, bool inl, bool  inr);
 
@@ -44,7 +48,4 @@ public:
     Hit *intersection(Ray ray);
 
     void apply_transform(Transform &transform);
-
-    Object *left;
-    Object *right;
 };

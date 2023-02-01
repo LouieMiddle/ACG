@@ -22,11 +22,12 @@
 
 #include <math.h>
 
-Phong::Phong(Colour p_ambient, Colour p_diffuse, Colour p_specular, float p_power) {
+Phong::Phong(Colour p_ambient, Colour p_diffuse, Colour p_specular, float p_power, float p_probability_diffuse) {
     ambient = p_ambient;
     diffuse = p_diffuse;
     specular = p_specular;
     power = p_power;
+    probability_diffuse = p_probability_diffuse;
 }
 
 // The compute_once() method supplies the ambient term.
@@ -39,7 +40,7 @@ Colour Phong::compute_once(Ray &viewer, Hit &hit, int recurse) {
 }
 
 // The compute_per_light() method supplies the diffuse and specular terms.
-Colour Phong::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
+Colour Phong::compute_per_light(Vector &viewer, Hit &hit, Vector &l_dir) {
     Colour result;
 
     float diff;
@@ -51,7 +52,7 @@ Colour Phong::compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
     result.g = 0.0f;
     result.b = 0.0f;
 
-    tolight = ldir;
+    tolight = l_dir;
     tolight.negate();
 
     toviewer = viewer;

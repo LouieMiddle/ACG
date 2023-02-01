@@ -19,9 +19,9 @@
 #include "sphere_object.h"
 #include <math.h>
 
-Sphere::Sphere(Vertex c, float r) {
-    center = c;
-    radius = r;
+Sphere::Sphere(Vertex p_centre, float p_radius) {
+    centre = p_centre;
+    radius = p_radius;
 }
 
 Hit *Sphere::intersection(Ray ray) {
@@ -30,9 +30,9 @@ Hit *Sphere::intersection(Ray ray) {
     // offset ray by sphere position
     // equivalent to transforming ray into local sphere space
 
-    ro.x = ray.position.x - center.x;
-    ro.y = ray.position.y - center.y;
-    ro.z = ray.position.z - center.z;
+    ro.x = ray.position.x - centre.x;
+    ro.y = ray.position.y - centre.y;
+    ro.z = ray.position.z - centre.z;
 
     float a = (float) ray.direction.dot(ray.direction);
     float b = (float) (2.0 * ray.direction.dot(ro));
@@ -44,7 +44,7 @@ Hit *Sphere::intersection(Ray ray) {
         return 0; // a negative value indicates no intersection.
     }
 
-    // an intersection has been found, record details in hit objects
+    // an intersection has been found, record details in hit object_list
 
     float ds = sqrtf(disc);
 
@@ -57,12 +57,12 @@ Hit *Sphere::intersection(Ray ray) {
     hit0->entering = true;
 
     hit0->position = ray.position + hit0->t * ray.direction;
-    hit0->normal = hit0->position - center;
+    hit0->normal = hit0->position - centre;
     hit0->normal.normalise();
 
-    if (hit0->normal.dot(ray.direction) > 0.0) {
-        hit0->normal.negate();
-    }
+//    if (hit0->normal.dot(ray.direction) > 0.0) {
+//        hit0->normal.negate();
+//    }
 
     Hit *hit1 = new Hit();
     hit1->what = this;
@@ -70,12 +70,12 @@ Hit *Sphere::intersection(Ray ray) {
     hit1->entering = false;
 
     hit1->position = ray.position + hit1->t * ray.direction;
-    hit1->normal = hit1->position - center;
+    hit1->normal = hit1->position - centre;
     hit1->normal.normalise();
 
-    if (hit1->normal.dot(ray.direction) > 0.0) {
-        hit1->normal.negate();
-    }
+//    if (hit1->normal.dot(ray.direction) > 0.0) {
+//        hit1->normal.negate();
+//    }
 
     hit0->next = hit1;
     hit1->next = 0;
@@ -84,5 +84,5 @@ Hit *Sphere::intersection(Ray ray) {
 }
 
 void Sphere::apply_transform(Transform &transform) {
-    transform.apply(center);
+    transform.apply(centre);
 }

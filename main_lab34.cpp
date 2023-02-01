@@ -28,12 +28,12 @@
 //#include "framebuffer.h"
 //#include "scene.h"
 //
-//// classes that contain our objects to be rendered, all derived from Object
+//// classes that contain our object_list to be rendered, all derived from Object
 //#include "polymesh_object.h"
 //#include "sphere_object.h"
 //#include "plane_object.h"
 //
-//// classes that contain our lights, all derived from Light
+//// classes that contain our light_list, all derived from Light
 //#include "directional_light.h"
 //
 //// classes that contain the materials applied to an object, all derived from Material

@@ -16,7 +16,7 @@
 * produced it.
 */
 
-// Object is the base class for objects.
+// Object is the base class for object_list.
 #ifndef _OBJECT_H_
 #define _OBJECT_H_
 
@@ -29,6 +29,9 @@ class Object {
 public:
     Object *next;
     Material *material;
+
+    Vertex centre;
+    float radius;
 
     Object() {
         next = (Object *) 0;

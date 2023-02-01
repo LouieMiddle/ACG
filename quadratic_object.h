@@ -16,16 +16,17 @@
 * produced it.
 */
 
-// The Quadratic Object defines and intersects with quadratic objects.
+// The Quadratic Object defines and intersects with quadratic object_list.
 
 #pragma once
 
 #include "object.h"
 
 class Quadratic : public Object {
-    float A, B, C, D, E, F, G, H, I, J;
+    float A, B, C, D, E, F, G, H, I, J, min_x, max_x, min_y, max_y, min_z, max_z;
 public:
-    Quadratic(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j);
+    Quadratic(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j,
+              float p_min_x, float p_max_x, float p_min_y, float p_max_y, float p_min_z, float p_max_z);
 
     Hit *intersection(Ray ray);
 

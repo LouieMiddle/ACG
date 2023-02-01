@@ -157,8 +157,51 @@ PolyMesh::PolyMesh(char *file, bool smooth) {
     cerr << "Meshfile read." << endl;
 
     next = 0;
+
+    calculate_bounding_sphere();
 }
 
+// Using Jack Ritter Algorithm
+void PolyMesh::calculate_bounding_sphere() {
+    float min_x = 0.0f, max_x = 0.0f, min_y = 0.0f, max_y = 0.0f, min_z = 0.0f, max_z = 0.0f;
+    
+    for(int i = 0; i < vertex_count; i++) {
+        if(vertex[i].x < min_x) min_x = vertex[i].x;
+        if(vertex[i].x > max_x) max_x = vertex[i].x;
+        if(vertex[i].y < min_y) min_y = vertex[i].y;
+        if(vertex[i].y > max_y) max_y = vertex[i].y;
+        if(vertex[i].z < min_z) min_z = vertex[i].z;
+        if(vertex[i].z > max_z) max_z = vertex[i].z;
+    }
+
+    float diff_x = fabs(max_x - min_x);
+    float diff_y = fabs(max_y - min_y);
+    float diff_z = fabs(max_z - min_z);
+
+    // max points used in texture generation
+    Vertex max_point = Vertex(max_x, max_y, max_z);
+    Vertex min_point = Vertex(min_x, min_y, min_z);
+
+    //form initial sphere
+    radius = max(diff_z, max(diff_x, diff_y)) / 2;
+    centre = max_point + min_point;
+    centre.x = centre.x * 0.5f;
+    centre.y = centre.y * 0.5f;
+    centre.z = centre.z * 0.5f;
+
+    for(int i = 0; i < vertex_count; i++) {
+        Vector point_vector = vertex[i] - centre;
+        float distance = point_vector.length();
+
+        if (distance > radius) {
+            float difference = (distance - radius) / 2;
+            radius = radius + difference;
+            centre = centre + difference * point_vector;
+        }
+    }
+
+    bounding_sphere = new Sphere(centre, radius);
+}
 
 // Moller-Trumbore
 bool PolyMesh::rayTriangleIntersect(const Ray &ray, Vector v0, Vector v1, Vector v2, float &t, float &u, float &v) {
@@ -276,6 +319,15 @@ Hit *PolyMesh::triangle_intersection(Ray ray, int which_triangle) {
 
 
 Hit *PolyMesh::intersection(Ray ray) {
+    Hit *bounding_hits = bounding_sphere->intersection(ray);
+
+    if (bounding_hits == 0) {
+        return bounding_hits;
+    }
+
+    delete bounding_hits->next;
+    delete bounding_hits;
+
     Hit *hits = 0;
 
     int i;

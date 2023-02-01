@@ -21,7 +21,8 @@
 
 using namespace std;
 
-Quadratic::Quadratic(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j) {
+Quadratic::Quadratic(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j,
+                     float p_min_x, float p_max_x, float p_min_y, float p_max_y, float p_min_z, float p_max_z) {
     A = a;
     B = b;
     C = c;
@@ -32,6 +33,12 @@ Quadratic::Quadratic(float a, float b, float c, float d, float e, float f, float
     H = h;
     I = i;
     J = j;
+    min_x = p_min_x;
+    max_x = p_max_x;
+    min_y = p_min_y;
+    max_y = p_max_y;
+    min_z = p_min_z;
+    max_z = p_max_z;
 }
 
 Vector Quadratic::calc_normal(Vertex intersection) {
@@ -91,6 +98,8 @@ Hit *Quadratic::intersection(Ray ray) {
 
     hit0->next = hit1;
     hit1->next = 0;
+
+    // TODO: Add capping off quadratic
 
     return hit0;
 }

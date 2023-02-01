@@ -26,6 +26,13 @@
 
 class Material {
 public:
+    float probability_diffuse;
+    float probability_specular;
+    float probability_transmissive;
+
+    float ior;
+    bool transmissive;
+
     // compute_once is called once per intersection
     virtual Colour compute_once(Ray &viewer, Hit &hit, int recurse) {
         Colour result;
@@ -36,7 +43,7 @@ public:
     }
 
     // compute_per_light is called for each light that reaches a surface
-    virtual Colour compute_per_light(Vector &viewer, Hit &hit, Vector &ldir) {
+    virtual Colour compute_per_light(Vector &viewer, Hit &hit, Vector &l_dir) {
         Colour result;
         result.r = 0.0f;
         result.g = 0.0f;
@@ -44,5 +51,5 @@ public:
         return result;
     }
 
-    // You will need additional material methods to support Photon-mapping.
+    // TODO: You will need additional material methods to support Photon-mapping.
 };
